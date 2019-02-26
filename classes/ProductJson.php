@@ -122,7 +122,7 @@ class ProductJson {
         $retval = $product['url'];
         if ((int)$id_product_attribute) {
             if (Tools::version_compare(_PS_VERSION_, '1.7', '>')) {
-                $url = str_replace('[ipa]', $id_product_attribute, $url);
+                $retval = str_replace('[ipa]', $id_product_attribute, $retval);
             }
             $retval .= '#';
             $attributes = $product['attributes'][$id_product_attribute]['attributes'];
