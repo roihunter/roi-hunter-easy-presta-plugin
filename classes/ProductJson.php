@@ -25,6 +25,7 @@ class ProductJson {
         $specific_price = array();
         $product['regular_price'] = Product::getPriceStatic($product['id_product'], true, (!empty($id_product_attribute) ? intval($product['id_product_attribute']) : NULL), 2, null, false, false, 1, false, null, null, null);
         $product['price'] = Product::getPriceStatic($product['id_product'], true, (!empty($id_product_attribute) ? intval($product['id_product_attribute']) : NULL), 2, null, false, true, 1, false, null, null, null, $specific_price);
+        $product['currency'] = Context::getContext()->currency->iso_code;
         if ($id_product_attribute) {
             $product['attributes'] = $this->getProductAttributes($id_product, $id_product_attribute, $id_lang, $id_shop);
         }
@@ -41,7 +42,7 @@ class ProductJson {
         }
 
         $map = array('date_created' => 'date_add', 'date_upd' => 'date_upd', 'date_modified' => 'date_modified',
-            'price' => 'price', 'visible' => 'active', 'purchasable' => 'available_for_order', 'virtual' => 'is_virtual',
+            'price' => 'price', 'currency' =>'currency', 'visible' => 'active', 'purchasable' => 'available_for_order', 'virtual' => 'is_virtual',
             'stock_quantity' => 'quantity', 'weight' => 'weight', 'name' => 'name', 'category' => 'category');
         while (list($outkey, $inkey) = each($map)) {
             $retval[$outkey] = $product[$inkey];
