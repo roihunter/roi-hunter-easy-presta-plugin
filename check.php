@@ -1,22 +1,15 @@
 <?php
+
 // is module active ?
-if ($_SERVER['HTTP_HOST'] == 'localhost:8080') {
-    define('DIRECT_DEBUG', false);
-}
 
 include(dirname(__FILE__) . '/../../config/config.inc.php');
 include(dirname(__FILE__) . '/../../init.php');
 $instance = Module::getInstanceByName('roihunter');
 
-if (defined('DIRECT_DEBUG') && 'DIRECT_DEBUG' == true) {
-    $client_token = $instance->getClientToken();
-} else {
-    $client_token = $_SERVER["HTTP_X_AUTHORIZATION"];
-
-    if (empty($client_token)) {
-        header('HTTP/1.0 403 Forbidden', true, 403);
-        die();
-    }
+$client_token = $_SERVER["HTTP_X_AUTHORIZATION"];
+if (empty($client_token)) {
+    header('HTTP/1.0 403 Forbidden', true, 403);
+    die();
 }
 
 if ($instance == false) {

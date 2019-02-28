@@ -8,15 +8,11 @@ include(dirname(__FILE__) . '/../../config/config.inc.php');
 include(dirname(__FILE__) . '/../../init.php');
 $instance = Module::getInstanceByName('roihunter');
 
-if (defined('DIRECT_DEBUG') && 'DIRECT_DEBUG' == true) {
-    $client_token = $instance->getClientToken();
-} else {
-    $client_token = $_SERVER["HTTP_X_AUTHORIZATION"];
+$client_token = $_SERVER["HTTP_X_AUTHORIZATION"];
 
-    if (empty($client_token)) {
-        header("HTTP/1.1 400 Bad Request");
-        exit;
-    }
+if (empty($client_token)) {
+    header("HTTP/1.1 400 Bad Request");
+    exit;
 }
 
 if ($instance == false) {
