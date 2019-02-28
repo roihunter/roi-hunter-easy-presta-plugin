@@ -1,4 +1,5 @@
 <?php
+
 // set module state from external source
 if ($_SERVER['HTTP_HOST'] == 'localhost:8080') {
     define('DIRECT_DEBUG', false);
