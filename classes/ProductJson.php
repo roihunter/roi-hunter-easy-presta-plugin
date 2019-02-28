@@ -4,7 +4,7 @@ class ProductJson {
     protected $product;
     protected $current_id_product = 0;
     protected $instance;
-    protected $categoryCache = array();
+    protected $categoryCache = [];
     protected static $_separator = ' | ';
 
     public function __construct($instance) {
@@ -22,9 +22,9 @@ class ProductJson {
 
         }
         $product = $this->product;
-        $specific_price = array();
-        $product['regular_price'] = Product::getPriceStatic($product['id_product'], true, (!empty($id_product_attribute) ? intval($product['id_product_attribute']) : NULL), 2, null, false, false, 1, false, null, null, null);
-        $product['price'] = Product::getPriceStatic($product['id_product'], true, (!empty($id_product_attribute) ? intval($product['id_product_attribute']) : NULL), 2, null, false, true, 1, false, null, null, null, $specific_price);
+        $specific_price = [];
+        $product['regular_price'] = Product::getPriceStatic($product['id_product'], true, (!empty($id_product_attribute) ? intval($product['id_product_attribute']) : null), 2, null, false, false, 1, false, null, null, null);
+        $product['price'] = Product::getPriceStatic($product['id_product'], true, (!empty($id_product_attribute) ? intval($product['id_product_attribute']) : null), 2, null, false, true, 1, false, null, null, null, $specific_price);
         $product['currency'] = Context::getContext()->currency->iso_code;
         if ($id_product_attribute) {
             $product['attributes'] = $this->getProductAttributes($id_product, $id_product_attribute, $id_lang, $id_shop);
@@ -34,16 +34,16 @@ class ProductJson {
 
 
     public function getJsonRow($product, $id_product_attribute) {
-        $retval = array();
+        $retval = [];
         if ($id_product_attribute) {
             $retval['id'] = $product['id_product'] . '-' . $id_product_attribute;
         } else {
             $retval['id'] = $product['id_product'];
         }
 
-        $map = array('date_created' => 'date_add', 'date_upd' => 'date_upd', 'date_modified' => 'date_modified',
-            'price' => 'price', 'currency' =>'currency', 'visible' => 'active', 'purchasable' => 'available_for_order', 'virtual' => 'is_virtual',
-            'stock_quantity' => 'quantity', 'weight' => 'weight', 'name' => 'name', 'category' => 'category');
+        $map = ['date_created' => 'date_add', 'date_upd' => 'date_upd', 'date_modified' => 'date_modified',
+            'price' => 'price', 'currency' => 'currency', 'visible' => 'active', 'purchasable' => 'available_for_order', 'virtual' => 'is_virtual',
+            'stock_quantity' => 'quantity', 'weight' => 'weight', 'name' => 'name', 'category' => 'category'];
         while (list($outkey, $inkey) = each($map)) {
             $retval[$outkey] = $product[$inkey];
         }
@@ -52,12 +52,12 @@ class ProductJson {
         if ($id_product_attribute && isset($product['attributes'][$id_product_attribute])) {
 
             //$retval['regular_price'] += $product['attributes'][$id_product_attribute]['price'];
-            $retval['attributes'] = array();
+            $retval['attributes'] = [];
             while (list($key, $val) = each($product['attributes'][$id_product_attribute]['attributes'])) {
-                $retval['attributes'][] = array('id' => $val[4], 'name' => $val[0], 'option' => $val[1]);
+                $retval['attributes'][] = ['id' => $val[4], 'name' => $val[0], 'option' => $val[1]];
             }
         }
-        $keys = array('available_date', 'available_now', 'available_later', 'condition', 'ean13');
+        $keys = ['available_date', 'available_now', 'available_later', 'condition', 'ean13'];
         foreach ($keys as $key) {
             $retval[$key] = $product[$key];
         }
@@ -90,11 +90,11 @@ class ProductJson {
                 $cover = $defaultcover;
         }
 
-        $retval['image'] = array('id' => $cover, 'src' => $product['images'][$cover]['url']);
+        $retval['image'] = ['id' => $cover, 'src' => $product['images'][$cover]['url']];
         reset($product['images']);
         while (list($key, $image) = each($product['images'])) {
             if ($key != $cover && ($id_product_attribute == 0 || in_array($id_product_attribute, $image['attributes']))) {
-                $retval['additional_images'] = array('id' => $key, 'src' => $image['url']);
+                $retval['additional_images'] = ['id' => $key, 'src' => $image['url']];
             }
         }
 
@@ -102,7 +102,7 @@ class ProductJson {
     }
 
     private function createDescription($description) {
-        $description = str_replace(array(',', '.', '>'), array(', ', '. ', '> '), $description);
+        $description = str_replace([',', '.', '>'], [', ', '. ', '> '], $description);
         $description = strip_tags($description);
         return trim($description);
     }
@@ -140,7 +140,7 @@ class ProductJson {
     }
 
     private function getImages($id_product, $id_lang, $product) {
-        $retval = array();
+        $retval = [];
         $link = Context::getContext()->link;
         $sql = 'SELECT i.id_image, i.id_product, i.cover,il.legend,ai.id_product_attribute
             FROM `' . _DB_PREFIX_ . 'image` i
@@ -154,10 +154,10 @@ class ProductJson {
         foreach ($images as $image) {
             $name = $this->toUrl(empty($image['legend']) ? $product['name'] : $image['legend']);
             if (!isset($retval[$image['id_image']])) {
-                $retval[$image['id_image']] = array(
+                $retval[$image['id_image']] = [
                     'cover' => $image['cover'],
                     'url' => $link->getImageLink($name, $product['id_product'] . '-' . $image['id_image'], $this->instance->getImageType()),
-                    'attributes' => array((int)$image['id_product_attribute']));
+                    'attributes' => [(int)$image['id_product_attribute']]];
             } else {
                 $retval[$image['id_image']]['attributes'][] = (int)$image['id_product_attribute'];
             }
@@ -175,7 +175,7 @@ class ProductJson {
     }
 
     private function cs_utf2ascii($s) {
-        static $tbl = array("\xc3\xa1" => "a", "\xc3\xa4" => "a", "\xc4\x8d" => "c", "\xc4\x8f" => "d", "\xc3\xa9" => "e", "\xc4\x9b" => "e", "\xc3\xad" => "i", "\xc4\xbe" => "l", "\xc4\xba" => "l", "\xc5\x88" => "n", "\xc3\xb3" => "o", "\xc3\xb6" => "o", "\xc5\x91" => "o", "\xc3\xb4" => "o", "\xc5\x99" => "r", "\xc5\x95" => "r", "\xc5\xa1" => "s", "\xc5\xa5" => "t", "\xc3\xba" => "u", "\xc5\xaf" => "u", "\xc3\xbc" => "u", "\xc5\xb1" => "u", "\xc3\xbd" => "y", "\xc5\xbe" => "z", "\xc3\x81" => "A", "\xc3\x84" => "A", "\xc4\x8c" => "C", "\xc4\x8e" => "D", "\xc3\x89" => "E", "\xc4\x9a" => "E", "\xc3\x8d" => "I", "\xc4\xbd" => "L", "\xc4\xb9" => "L", "\xc5\x87" => "N", "\xc3\x93" => "O", "\xc3\x96" => "O", "\xc5\x90" => "O", "\xc3\x94" => "O", "\xc5\x98" => "R", "\xc5\x94" => "R", "\xc5\xa0" => "S", "\xc5\xa4" => "T", "\xc3\x9a" => "U", "\xc5\xae" => "U", "\xc3\x9c" => "U", "\xc5\xb0" => "U", "\xc3\x9d" => "Y", "\xc5\xbd" => "Z");
+        static $tbl = ["\xc3\xa1" => "a", "\xc3\xa4" => "a", "\xc4\x8d" => "c", "\xc4\x8f" => "d", "\xc3\xa9" => "e", "\xc4\x9b" => "e", "\xc3\xad" => "i", "\xc4\xbe" => "l", "\xc4\xba" => "l", "\xc5\x88" => "n", "\xc3\xb3" => "o", "\xc3\xb6" => "o", "\xc5\x91" => "o", "\xc3\xb4" => "o", "\xc5\x99" => "r", "\xc5\x95" => "r", "\xc5\xa1" => "s", "\xc5\xa5" => "t", "\xc3\xba" => "u", "\xc5\xaf" => "u", "\xc3\xbc" => "u", "\xc5\xb1" => "u", "\xc3\xbd" => "y", "\xc5\xbe" => "z", "\xc3\x81" => "A", "\xc3\x84" => "A", "\xc4\x8c" => "C", "\xc4\x8e" => "D", "\xc3\x89" => "E", "\xc4\x9a" => "E", "\xc3\x8d" => "I", "\xc4\xbd" => "L", "\xc4\xb9" => "L", "\xc5\x87" => "N", "\xc3\x93" => "O", "\xc3\x96" => "O", "\xc5\x90" => "O", "\xc3\x94" => "O", "\xc5\x98" => "R", "\xc5\x94" => "R", "\xc5\xa0" => "S", "\xc5\xa4" => "T", "\xc3\x9a" => "U", "\xc5\xae" => "U", "\xc3\x9c" => "U", "\xc5\xb0" => "U", "\xc3\x9d" => "Y", "\xc5\xbd" => "Z"];
         return strtr($s, $tbl);
     }
 
@@ -227,7 +227,7 @@ class ProductJson {
 
         $combinations = Db::getInstance()->executeS($sql);
 
-        $comb_array = array();
+        $comb_array = [];
 
         if (is_array($combinations)) {
 
@@ -243,7 +243,7 @@ class ProductJson {
                         $carka = ',';
                     }
                 }
-                $layered = array();
+                $layered = [];
                 if (strlen($in)) {
                     $sql = 'SELECT    id_attribute, url_name, meta_title FROM ' . _DB_PREFIX_ . 'layered_indexable_attribute_lang_value  WHERE 
                         id_lang =' . (int)$id_lang . ' AND id_attribute IN (' . $in . ')';
@@ -252,7 +252,7 @@ class ProductJson {
                         foreach ($res as $atr) {
                             if (!empty($atr['meta_title'])) {
                                 $layered[$atr['id_attribute']] = $atr['meta_title'];
-                            } elseif ($uselayered == 2) {
+                            } else if ($uselayered == 2) {
                                 $layered[$atr['id_attribute']] = $atr['url_name'];
                             }
                         }
@@ -267,9 +267,9 @@ class ProductJson {
 
                 $comb_array[$combination['id_product_attribute']]['id_product_attribute'] = $combination['id_product_attribute'];
                 if (Configuration::get('ZBOZI_ATTR_PUBLIC')) {
-                    $comb_array[$combination['id_product_attribute']]['attributes'][] = array($combination['group_pname'], $combination['attribute_name'], self::friendlyAttribute($combination['group_name']), $attribute_url, $combination['id_attribute'], $combination['id_attribute_group']);
+                    $comb_array[$combination['id_product_attribute']]['attributes'][] = [$combination['group_pname'], $combination['attribute_name'], self::friendlyAttribute($combination['group_name']), $attribute_url, $combination['id_attribute'], $combination['id_attribute_group']];
                 } else {
-                    $comb_array[$combination['id_product_attribute']]['attributes'][] = array($combination['group_name'], $combination['attribute_name'], self::friendlyAttribute($combination['group_name']), $attribute_url, $combination['id_attribute'], $combination['id_attribute_group']);
+                    $comb_array[$combination['id_product_attribute']]['attributes'][] = [$combination['group_name'], $combination['attribute_name'], self::friendlyAttribute($combination['group_name']), $attribute_url, $combination['id_attribute'], $combination['id_attribute_group']];
                 }
 
                 $comb_array[$combination['id_product_attribute']]['price'] = $combination['price'];
@@ -288,7 +288,7 @@ class ProductJson {
     }
 
     private function friendlyAttribute($val) {
-        $val = str_replace(Configuration::get('PS_ATTRIBUTE_ANCHOR_SEPARATOR'), '_', Tools::link_rewrite(str_replace(array(',', '.'), '-', $val)));
+        $val = str_replace(Configuration::get('PS_ATTRIBUTE_ANCHOR_SEPARATOR'), '_', Tools::link_rewrite(str_replace([',', '.'], '-', $val)));
         return $val;
     }
 
@@ -299,7 +299,7 @@ class ProductJson {
 
     private function getProductDefaultCategory($id_category, $id_lang) {
         if (!isset($this->categoryCache[$id_category])) {
-            $cats = array();
+            $cats = [];
             $cats[] = $id_category;
             $this->getRecursiveCats($id_category, $cats);
             $this->categoryCache[$id_category] = $this->translateCats($cats, $id_lang);
@@ -308,7 +308,7 @@ class ProductJson {
     }
 
     private function translateCats($cats, $id_lang) {
-        $retval = array();
+        $retval = [];
         if (is_array($cats)) {
             $cats = array_reverse($cats);
             foreach ($cats as $cat) {
