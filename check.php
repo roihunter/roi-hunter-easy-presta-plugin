@@ -10,12 +10,12 @@ $instance = Module::getInstanceByName('roihunter');
 
 if ($instance == false) {
     $content = [
-        "prestashop_version" => _PS_VERSION_,
+        "prestashop_version" => "",
         "prestashop_mode" => "",
         "roihuntereasy_enabled" => false,
         "roihuntereasy_accounts" => 1,
         "roihuntereasy_version" => 0,
-        "php_version" => phpversion(),
+        "php_version" => "",
     ];
     $content = json_encode($content);
 
