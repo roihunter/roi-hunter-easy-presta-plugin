@@ -519,6 +519,7 @@ class Roihunter extends Module {
         $output .= '<tr><td>products endpoint</td><td>' . $base . 'products.php</td></tr>';
         $output .= '<tr><td>google tracking endpoint</td><td>' . $base . 'google-tracking.php</td></tr>';
         $output .= '<tr><td>facebook tracking endpoint</td><td>' . $base . 'facebook-tracking.php</td></tr>';
+        $val = "";
         foreach ($this->keys as $key) {
             $translated = $this->translateKey($key);
             $val .= Configuration::get($translated, null, Shop::getGroupFromShop($id_shop), $id_shop);
