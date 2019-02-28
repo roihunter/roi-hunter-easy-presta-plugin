@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'PUT') {
 
     foreach ($keys as $key) {
         if ($key == 'id') {
-            if (!(int)$data[$key]) {
+            if ($data[$key] != null && !is_int($data[$key])) {
                 header('HTTP/1.0 400 Bad Request - id is not int.', true, 400);
                 die();
             }
