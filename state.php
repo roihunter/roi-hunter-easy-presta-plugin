@@ -55,11 +55,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'PUT') {
     header("Content-Type:application/json");
     echo($content);
     die();
-} else if ($_SERVER['REQUEST_METHOD'] == 'DELETE') {
-    $keys = $instance->getKeys();
-    foreach ($keys as $key) {
-        $instance->clearConfigFormValue($key, $id_shop);
-    }
 } else {
     header('HTTP/1.0 405 Method Not Allowed', true, 405);
     die();
