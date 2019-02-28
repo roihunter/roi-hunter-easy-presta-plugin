@@ -33,7 +33,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'PUT') {
     $keys = $instance->getKeys();
     $content = [];
     foreach ($keys as $key) {
-        $content[$key] = $instance->getConfigFormValue($key, $id_shop);
+        if ($key != 'access_token') {   //do not send rh access token, we don't need it
+            $content[$key] = $instance->getConfigFormValue($key, $id_shop);
+        }
     }
     $content = json_encode($content);
     header("HTTP/1.1 200 OK");
