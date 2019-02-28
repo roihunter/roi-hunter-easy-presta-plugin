@@ -28,21 +28,19 @@ if ($client_token != $instance->getClientToken()) { // token je jen jeden pro mu
     die();
 }
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] == 'PUT') {
     $stream = file_get_contents('php://input');
     $data = json_decode($stream, true);
     $keys = $instance->getKeys();
 
     foreach ($keys as $key) {
-        if (isset($data[$key])) {
-            if ($key == 'id') {
-                if (!(int)$data[$key]) {
-                    header('HTTP/1.0 403 Forbidden', true, 403);
-                    die();
-                }
+        if ($key == 'id') {
+            if (!(int)$data[$key]) {
+                header('HTTP/1.0 403 Forbidden', true, 403);
+                die();
             }
-            $instance->saveConfigFormValue($key, $data[$key], $id_shop);
         }
+        $instance->saveConfigFormValue($key, $data[$key], $id_shop);
     }
 
     header("HTTP/1.1 200 OK");
