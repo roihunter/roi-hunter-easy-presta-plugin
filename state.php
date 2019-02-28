@@ -24,7 +24,7 @@ $id_shop = $instance->getShopFromUrl($_SERVER['HTTP_HOST']);
 Context::getContext()->shop->id = $id_shop;
 
 if ($client_token != $instance->getClientToken()) { // token je jen jeden pro multishop
-    header('HTTP/1.0 403 Forbidden', true, 403);
+    header('HTTP/1.0 403 Forbidden - Token is not valid.', true, 403);
     die();
 }
 
@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'PUT') {
     foreach ($keys as $key) {
         if ($key == 'id') {
             if (!(int)$data[$key]) {
-                header('HTTP/1.0 403 Forbidden', true, 403);
+                header('HTTP/1.0 400 Bad Request - id is not int.', true, 400);
                 die();
             }
         }
@@ -60,6 +60,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'PUT') {
     foreach ($keys as $key) {
         $instance->clearConfigFormValue($key, $id_shop);
     }
+} else {
+    header('HTTP/1.0 405 Method Not Allowed', true, 405);
+    die();
 }
  
  
