@@ -689,11 +689,11 @@ class Roihunter extends Module {
                         break;
                     }
             }
-            $retval['id_shop'] = (int)Context::getContext()->shop->id;
             $retval['id_shop_group'] = (int)Shop::getContextShopGroupID();
         } else {
             $retval['multishop'] = false;
         }
+        $retval['id_shop'] = (int)Context::getContext()->shop->id;
 
         return $retval;
     }
