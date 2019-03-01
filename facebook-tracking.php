@@ -16,8 +16,8 @@ $id_shop = $instance->getShopFromUrl($_SERVER['HTTP_HOST']);
 Context::getContext()->shop->id = $id_shop;
 
 if ($_SERVER['REQUEST_METHOD'] == 'DELETE') {
-    $key = 'fb_pixel_id';
-    $instance->clearConfigFormValue($key, $id_shop);
+    $roiHunterStorage = ROIHunterStorage::getInstance();
+    $roiHunterStorage->setFbPixelId(null);
 }
 
 header("HTTP/1.1 200 OK");

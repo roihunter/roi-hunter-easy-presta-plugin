@@ -28,10 +28,12 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+require_once(_PS_MODULE_DIR_ . 'roihunter/classes/storage/storage.php');
+
 class Roihunter extends Module {
 
     protected $config_form = false;
-    protected $keys = ['id', 'access_token', 'google_conversion_id', 'google_conversion_label', 'fb_pixel_id'];
+    private $roiHunterStorage;
 
     public function __construct() {
         $this->name = 'roihunter';
@@ -46,6 +48,7 @@ class Roihunter extends Module {
         $this->description = $this->l('ROI Hunter Easy pro prestashop');
         $this->confirmUninstall = $this->l('');
         $this->ps_versions_compliancy = ['min' => '1.6', 'max' => _PS_VERSION_];
+        $this->roiHunterStorage = ROIHunterStorage::getInstance();
     }
 
     public function install() {
@@ -57,19 +60,15 @@ class Roihunter extends Module {
             $this->registerHook('displayBackOfficeHeader');
         if ($retval) {
             $this->installModuleTab('AdminRoihunter', 'Roihunter Easy', 0);
-            $token = $this->getSecureToken();
-            Configuration::updateValue('ROIHUNTER_CLIENT_TOKEN', $token);
+            $this->roiHunterStorage->setClientToken($this->getSecureToken());
         }
         return $retval;
     }
 
     public function uninstall() {
-        Configuration::deleteByName('ROIHUNTER_CLIENT_TOKEN');
+        $this->roiHunterStorage->setClientToken(null);
         $this->uninstallModuleTab('AdminRoihunter');
-        foreach ($this->keys as $key) {
-            $key = $this->translateKey($key);
-            Configuration::deleteByName($key);
-        }
+        $this->roiHunterStorage->clearStorage();
         return parent::uninstall();
     }
 
@@ -78,9 +77,9 @@ class Roihunter extends Module {
     public function hookDisplayFooter($params) {
         $id_shop = Context::getContext()->shop->id;
 
-        $google_conversion_id = $this->getConfigFormValue('google_conversion_id', $id_shop);
-        $google_conversion_label = $this->getConfigFormValue('google_conversion_label', $id_shop);
-        $fb_pixel_id = $this->getConfigFormValue('fb_pixel_id', $id_shop);
+        $google_conversion_id = $this->roiHunterStorage->getGoogleConversionId();
+        $google_conversion_label = $this->roiHunterStorage->getGoogleConversionLabel();
+        $fb_pixel_id = $this->roiHunterStorage->getFbPixelId();
         $profile = $this->getActiveBeProfile();
         if ($profile == 'developer') {
             $google_conversion_id = empty($google_conversion_id) ? 'MOCKGID' : $google_conversion_id;
@@ -104,7 +103,7 @@ class Roihunter extends Module {
             if (!empty($google_conversion_id)) {
                 $this->context->smarty->assign(
                     [
-                        'google_conversion_id' => $google_conversion_id,
+                        ROIHunterStorage::RH_GOOGLE_CONVERSION_ID => $google_conversion_id,
                         'gid_product' => $product['id_product'],
                         'inner_cart' => $cart_inner_google,
                         'gid_price' => $product['price'],
@@ -114,7 +113,7 @@ class Roihunter extends Module {
             if (!empty($fb_pixel_id)) {
                 $iso = Context::getContext()->currency->iso_code;
                 $this->context->smarty->assign([
-                    'fb_pixel_id' => $fb_pixel_id,
+                    ROIHunterStorage::RH_FB_PIXEL_ID => $fb_pixel_id,
                     'currency' => $iso,
                     'fid_product' => $product['id_product'],
                     'fb_price' => $product['price']]);
@@ -138,7 +137,7 @@ class Roihunter extends Module {
             if (!empty($google_conversion_id)) {
                 $this->context->smarty->assign(
                     [
-                        'google_conversion_id' => $google_conversion_id,
+                        ROIHunterStorage::RH_GOOGLE_CONVERSION_ID => $google_conversion_id,
                         'inner_cart' => $cart_inner_google,
                         'gid_product' => $itemids,
                     ]);
@@ -149,8 +148,8 @@ class Roihunter extends Module {
             if (!empty($google_conversion_id)) {
                 $this->context->smarty->assign(
                     [
-                        'google_conversion_id' => $google_conversion_id,
-                        'google_conversion_label' => $google_conversion_label,
+                        ROIHunterStorage::RH_GOOGLE_CONVERSION_ID => $google_conversion_id,
+                        ROIHunterStorage::RH_GOOGLE_CONVERSION_LABEL => $google_conversion_label,
                         'id_order' => $order['id_order'],
                         'currency' => $order['currency'],
                         'gid_products' => $order['item_ids'],
@@ -164,7 +163,7 @@ class Roihunter extends Module {
 
                 $this->context->smarty->assign(
                     [
-                        'fb_pixel_id' => $fb_pixel_id,
+                        ROIHunterStorage::RH_FB_PIXEL_ID => $fb_pixel_id,
                         'currency' => $order['currency'],
                         'fid_product' => $order['item_ids'],
                         'fb_price' => $order['total_value'],
@@ -175,7 +174,7 @@ class Roihunter extends Module {
             if (strlen($cart_inner_google)) {
                 $this->context->smarty->assign(
                     [
-                        'google_conversion_id' => $google_conversion_id,
+                        ROIHunterStorage::RH_GOOGLE_CONVERSION_ID => $google_conversion_id,
                         'inner_cart' => $cart_inner_google,
                     ]);
                 $output .= $this->context->smarty->fetch($this->local_path . 'views/templates/front/gid_cart_outer.tpl');
@@ -246,7 +245,7 @@ class Roihunter extends Module {
         if (!empty($google_conversion_id)) {
             $this->context->smarty->assign(
                 [
-                    'google_conversion_id' => $google_conversion_id,
+                    ROIHunterStorage::RH_GOOGLE_CONVERSION_ID => $google_conversion_id,
                     'gid_cart_products' => $item_ids,
                     'gid_price' => $price,
                 ]);
@@ -259,7 +258,7 @@ class Roihunter extends Module {
 
             $this->context->smarty->assign(
                 [
-                    'fb_pixel_id' => $fb_pixel_id,
+                    ROIHunterStorage::RH_FB_PIXEL_ID => $fb_pixel_id,
                     'currency' => $currency->iso_code,
                     'fid_product' => $item_ids,
                     'fb_price' => $price,
@@ -335,7 +334,7 @@ class Roihunter extends Module {
         $id_shop = Shop::isFeatureActive() ? Context::getContext()->shop->id : null;
         $this->context->controller->addJS($this->_path . '/views/js/front.js');
         $this->context->controller->addCSS($this->_path . '/views/css/front.css');
-        $fb_pixel_id = $this->getConfigFormValue('fb_pixel_id', $id_shop);
+        $fb_pixel_id = $this->roiHunterStorage->getFbPixelId();
         $profile = $this->getActiveBeProfile($id_shop);
         if ($profile == 'developer') {
             $google_conversion_id = empty($google_conversion_id) ? 'MOCKGID' : $google_conversion_id;
@@ -416,7 +415,7 @@ class Roihunter extends Module {
     }
 
     public function getActiveBeProfile($id_shop = null) {
-        switch (Configuration::get('ROIHUNTER_ACTIVEBEPROFILE', null, null, $id_shop)) {
+        switch (Configuration::get(ROIHunterStorage::RH_ACTIVE_BE_PROFILE, null, null, $id_shop)) {
             case 0:
                 return 'staging';
             case 1:
@@ -426,26 +425,8 @@ class Roihunter extends Module {
         }
     }
 
-    public function getCustomerId($id_shop) {
-        $key = $this->translateKey('id');
-        return Configuration::get($key, null, null, $id_shop);
-    }
-
-    public function getAccessToken($id_shop) {
-        if (Configuration::get('ROIHUNTER_ACTIVEBEPROFILE', null, null, $id_shop) != 1) {
-            return 'demoAccessToken';
-        }
-
-        $key = $this->translateKey('access_token');
-        return Configuration::get($key, null, null, $id_shop);
-    }
-
-    public function getClientToken() {
-        return Configuration::get('ROIHUNTER_CLIENT_TOKEN');
-    }
-
     public function getIframeUrl($id_shop) {
-        switch (Configuration::get('ROIHUNTER_ACTIVEBEPROFILE', null, null, $id_shop)) {
+        switch (Configuration::get(ROIHunterStorage::RH_ACTIVE_BE_PROFILE, null, null, $id_shop)) {
             case 0:
                 return 'https://goostav-fe-staging.roihunter.com'; // staging
             case 1:
@@ -469,26 +450,6 @@ class Roihunter extends Module {
             $id_shop = (int)Db::getInstance()->getValue($sql);
         }
         return $id_shop;
-    }
-
-
-    public function getKeys() {
-        return $this->keys;
-    }
-
-    public function saveConfigFormValue($key, $value, $id_shop) {
-        $key = $this->translateKey($key);
-        Configuration::updateValue($key, $value, false, Shop::getGroupFromShop($id_shop), $id_shop);
-    }
-
-    public function getConfigFormValue($key, $id_shop = null) {
-        $key = $this->translateKey($key);
-        return Configuration::get($key, null, Shop::getGroupFromShop($id_shop), $id_shop);
-    }
-
-    public function clearConfigFormValue($key, $id_shop) {
-        $key = $this->translateKey($key);
-        Configuration::deleteFromContext($key);
     }
 
     /**
@@ -520,10 +481,8 @@ class Roihunter extends Module {
         $output .= '<tr><td>google tracking endpoint</td><td>' . $base . 'google-tracking.php</td></tr>';
         $output .= '<tr><td>facebook tracking endpoint</td><td>' . $base . 'facebook-tracking.php</td></tr>';
         $val = "";
-        foreach ($this->keys as $key) {
-            $translated = $this->translateKey($key);
-            $val .= Configuration::get($translated, null, Shop::getGroupFromShop($id_shop), $id_shop);
-            $output .= '<tr><td>' . $key . '</td><td>' . $val . '</td></tr>';
+        foreach ($this->roiHunterStorage->getStorageWithoutTokens() as $key => $value) {
+            $output .= '<tr><td>' . $key . '</td><td>' . $value . '</td></tr>';
         }
         $output .= '</table>';
 
@@ -572,7 +531,7 @@ class Roihunter extends Module {
                     [
                         'type' => 'switch',
                         'label' => $this->l('Active application profile'),
-                        'name' => 'ROIHUNTER_ACTIVEBEPROFILE',
+                        'name' => ROIHunterStorage::RH_ACTIVE_BE_PROFILE,
                         'is_bool' => true,
                         'desc' => $this->l(''),
                         'values' => [
@@ -602,7 +561,7 @@ class Roihunter extends Module {
      */
     protected function getConfigFormValues() {
         return [
-            'ROIHUNTER_ACTIVEBEPROFILE' => Configuration::get('ROIHUNTER_ACTIVEBEPROFILE'),
+            ROIHunterStorage::RH_ACTIVE_BE_PROFILE => Configuration::get(ROIHunterStorage::RH_ACTIVE_BE_PROFILE),
 
         ];
     }
@@ -612,7 +571,7 @@ class Roihunter extends Module {
      */
     protected function postProcess() {
         $form_values = $this->getConfigFormValues();
-        $integers = ['ROIHUNTER_ACTIVEBEPROFILE'];
+        $integers = [ROIHunterStorage::RH_ACTIVE_BE_PROFILE];
         foreach (array_keys($form_values) as $key) {
             if (in_array($key, $integers)) {
                 Configuration::updateValue($key, (int)Tools::getValue($key));
@@ -697,14 +656,6 @@ class Roihunter extends Module {
 
         return $retval;
     }
-
-    private function translateKey($key) {
-        if ($key == 'google_conversion_label') { // too long for ps 1.5
-            return 'ROIHUNTER_GOOGLE_LABEL';
-        }
-        return 'ROIHUNTER_' . strtoupper($key);
-    }
-
 
     private function getSecureToken() {
         if (function_exists('openssl_random_pseudo_bytes')) {
