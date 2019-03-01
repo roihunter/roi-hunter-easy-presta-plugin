@@ -378,7 +378,7 @@ class Roihunter extends Module {
      * state.php
      * ... s paramatrem id_shop
      */
-    public function getRhStateApiBaseUrl() {
+    public function getRhStateApiBaseUrl($id_shop) {
         $base = $this->getStoreUrl($id_shop);
         // $protocol = Configuration::get('PS_SSL_ENABLED')?'https://':'http://';
         return $base . __PS_BASE_URI__ . 'modules/roihunter/';
@@ -444,7 +444,7 @@ class Roihunter extends Module {
         return Configuration::get('ROIHUNTER_CLIENT_TOKEN');
     }
 
-    public function getIframeUrl() {
+    public function getIframeUrl($id_shop) {
         switch (Configuration::get('ROIHUNTER_ACTIVEBEPROFILE', null, null, $id_shop)) {
             case 0:
                 return 'https://goostav-fe-staging.roihunter.com'; // staging

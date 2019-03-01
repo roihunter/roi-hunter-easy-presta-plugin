@@ -42,7 +42,7 @@ class AdminRoihunterController extends AdminController {
         Context::getContext()->smarty->assign(
             [
                 'params' => $params,
-                'iframeBaseUrl' => pSQL($this->instance->getIframeUrl()),
+                'iframeBaseUrl' => pSQL($this->instance->getIframeUrl($id_shop)),
             ]
         );
 
