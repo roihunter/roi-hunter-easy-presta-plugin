@@ -1,36 +1,18 @@
 <?php
-if ($_SERVER['HTTP_HOST'] == 'localhost:8080') {
-    define('DIRECT_DEBUG', true);
-    $_GET['page'] = 1;
-}
-
 
 include(dirname(__FILE__) . '/../../config/config.inc.php');
 include(dirname(__FILE__) . '/../../init.php');
+require_once(_PS_MODULE_DIR_ . 'roihunter/classes/ProductJson.php');
+require_once(_PS_MODULE_DIR_ . 'roihunter/classes/auth/authentication.php');
+
+ROIHunterAuthenticator::getInstance()->authenticate();
+
 $instance = Module::getInstanceByName('roihunter');
 
-if (defined('DIRECT_DEBUG') && 'DIRECT_DEBUG' == true) {
-    $client_token = $instance->getClientToken();
-} else {
-    $client_token = $_SERVER["HTTP_X_AUTHORIZATION"];
-
-    if (empty($client_token)) {
-        header("HTTP/1.1 400 Bad Request");
-        exit;
-    }
-}
-
-
-require_once(_PS_MODULE_DIR_ . 'roihunter/classes/ProductJson.php');
 Context::getContext()->shop->id = $id_shop;
-
-
 $id_shop = $instance->getShopFromUrl($_SERVER['HTTP_HOST']);
 Context::getContext()->shop->id = $id_shop;
-if ($client_token != $instance->getClientToken()) { // token je jen jeden pro multishop
-    header("HTTP/1.1 401 Unauthorized");
-    exit;
-}
+
 
 /*
 $stream = file_get_contents('php://input');

@@ -30,7 +30,8 @@ class AdminRoihunterController extends AdminController {
         if ($accessToken = $this->instance->getAccessToken($id_shop)) {
             $params['accessToken'] = pSQL($accessToken);
         }
-        if ($clientToken = $this->instance->getClientToken()) {
+        $clientToken = $this->instance->getClientToken();
+        if (isset($clientToken) && !isset($params['accessToken'])) {   //we can't send client token if access token exists
             $params['clientToken'] = pSQL($clientToken);
         }
         /* 
