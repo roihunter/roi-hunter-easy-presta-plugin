@@ -62,14 +62,8 @@ class ROIHunterStorage {
     }
 
     public function getAccessToken() {
-
-        if (Configuration::get(self::RH_ACTIVE_BE_PROFILE, null, null, $this->shopId) != 1) {
-            return 'demoAccessToken';
-        }
-
         return $this->getConfigFormValue(self::RH_ACCESS_TOKEN);
     }
-
 
     public function getGoogleConversionId() {
         return $this->getConfigFormValue(self::RH_GOOGLE_CONVERSION_ID);
