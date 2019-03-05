@@ -1,5 +1,7 @@
 <?php
 
+require_once(_PS_MODULE_DIR_ . 'roihunter/classes/storage/storage.php');
+
 class ROIHunterAuthenticator {
 
     private static $instance;
@@ -9,10 +11,7 @@ class ROIHunterAuthenticator {
 
     private function __construct() {
 
-        $rhInstance = Module::getInstanceByName('roihunter');
-        if (isset($rhInstance)) {
-            $this->serverToken = $rhInstance->getClientToken();
-        }
+        $this->serverToken = ROIHunterStorage::getInstance()->getClientToken();
         $this->client_token = $_SERVER["HTTP_X_AUTHORIZATION"];
     }
 

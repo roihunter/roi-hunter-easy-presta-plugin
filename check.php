@@ -1,14 +1,11 @@
 <?php
 
-// is module active ?
-
 include(dirname(__FILE__) . '/../../config/config.inc.php');
 include(dirname(__FILE__) . '/../../init.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/auth/authentication.php');
+require_once(_PS_MODULE_DIR_ . 'roihunter/roihunter.php');
 
-$instance = Module::getInstanceByName('roihunter');
-
-if ($instance == false) {
+if (!Roihunter::isModuleLoaded()) {
     $content = [
         "prestashop_version" => "",
         "prestashop_mode" => "",
@@ -27,12 +24,13 @@ if ($instance == false) {
 
 ROIHunterAuthenticator::getInstance()->authenticate();
 
-$id_shop = $instance->getShopFromUrl($_SERVER['HTTP_HOST']);
+$roihunterModule = Roihunter::getModuleInstance();
+$id_shop = $roihunterModule->getShopFromUrl($_SERVER['HTTP_HOST']);
 Context::getContext()->shop->id = $id_shop;
 
 // nelze pred contextem eshopu   
 $enabled = true;
-if (!$instance->active || !Module::isEnabled('roihunter')) {
+if (!$roihunterModule->active || !Module::isEnabled('roihunter')) {
     $enabled = false;
 }
 
@@ -41,7 +39,7 @@ $content = [
     "prestashop_mode" => "",
     "roihuntereasy_enabled" => $enabled,
     "roihuntereasy_accounts" => 1,
-    "roihuntereasy_version" => $instance->getPluginVersion(),
+    "roihuntereasy_version" => $roihunterModule->getPluginVersion(),
     "php_version" => phpversion(),
 ];
 $content = json_encode($content);

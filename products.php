@@ -4,13 +4,14 @@ include(dirname(__FILE__) . '/../../config/config.inc.php');
 include(dirname(__FILE__) . '/../../init.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/ProductJson.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/auth/authentication.php');
+require_once(_PS_MODULE_DIR_ . 'roihunter/roihunter.php');
 
 ROIHunterAuthenticator::getInstance()->authenticate();
 
-$instance = Module::getInstanceByName('roihunter');
+$roihunterModule = Roihunter::getModuleInstance();
 
 Context::getContext()->shop->id = $id_shop;
-$id_shop = $instance->getShopFromUrl($_SERVER['HTTP_HOST']);
+$id_shop = $roihunterModule->getShopFromUrl($_SERVER['HTTP_HOST']);
 Context::getContext()->shop->id = $id_shop;
 
 
@@ -60,7 +61,7 @@ foreach ($hits as $hit) {
     $counter++;
 }
 
-$json = new ProductJson($instance);
+$json = new ProductJson($roihunterModule);
 $jsonData = [];
 while (list($id_product, $data) = each($items)) {
     foreach ($data as $item) {

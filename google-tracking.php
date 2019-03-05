@@ -3,19 +3,19 @@
 include(dirname(__FILE__) . '/../../config/config.inc.php');
 include(dirname(__FILE__) . '/../../init.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/auth/authentication.php');
+require_once(_PS_MODULE_DIR_ . 'roihunter/roihunter.php');
 
 ROIHunterAuthenticator::getInstance()->authenticate();
 
-$instance = Module::getInstanceByName('roihunter');
+$roihunterModule = Roihunter::getModuleInstance();
 
-$id_shop = $instance->getShopFromUrl($_SERVER['HTTP_HOST']);
+$id_shop = $roihunterModule->getShopFromUrl($_SERVER['HTTP_HOST']);
 Context::getContext()->shop->id = $id_shop;
 
 if ($_SERVER['REQUEST_METHOD'] == 'DELETE') {
-    $keys = ['google_conversion_id', 'google_conversion_label'];
-    foreach ($keys as $key) {
-        $instance->clearConfigFormValue($key, $id_shop);
-    }
+    $roiHunterStorage = ROIHunterStorage::getInstance();
+    $roiHunterStorage->setGoogleConversionId(null);
+    $roiHunterStorage->setGoogleConversionLabel(null);
 }
 
 header("HTTP/1.1 200 OK");
