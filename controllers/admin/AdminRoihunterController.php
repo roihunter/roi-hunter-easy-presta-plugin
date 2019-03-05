@@ -1,33 +1,35 @@
 <?php
 
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/storage/storage.php');
+require_once(_PS_MODULE_DIR_ . 'roihunter/roihunter.php');
 
 class AdminRoihunterController extends AdminController {
-    protected $instance;
+
+    private $roihunterModule;
 
     public function __construct() {
         $this->bootstrap = true;
-        $this->instance = Module::getInstanceByName('roihunter');
+        $this->roihunterModule = Roihunter::getModuleInstance();
         parent::__construct();
     }
 
     public function initContent() {
         $this->display = 'view';
 
-        $shop_context = $this->instance->getAdminShopContext();
+        $shop_context = $this->roihunterModule->getAdminShopContext();
         $id_shop = $shop_context['id_shop'];
         $roiHunterStorage = ROIHunterStorage::getInstance();
 
         $params = [];
-        $params['type'] = pSQL($this->instance->getPluginType());
-        $params['storeUrl'] = pSQL($this->instance->getStoreUrl($id_shop));
-        $params['rhStateApiBaseUrl'] = pSQL($this->instance->getRhStateApiBaseUrl($id_shop));
-        $params['storeName'] = pSQL($this->instance->getStoreName($id_shop));
-        $params['storeCurrency'] = pSQL($this->instance->getStoreCurrency($id_shop));
-        $params['storeLanguage'] = pSQL($this->instance->getStoreLanguage($id_shop));
-        $params['storeCountry'] = pSQL($this->instance->getStoreCountry($id_shop));
-        $params['pluginVersion'] = pSQL($this->instance->getPluginVersion());
-        $params['activeBeProfile'] = pSQL($this->instance->getActiveBeProfile($id_shop));
+        $params['type'] = pSQL($this->roihunterModule->getPluginType());
+        $params['storeUrl'] = pSQL($this->roihunterModule->getStoreUrl($id_shop));
+        $params['rhStateApiBaseUrl'] = pSQL($this->roihunterModule->getRhStateApiBaseUrl($id_shop));
+        $params['storeName'] = pSQL($this->roihunterModule->getStoreName($id_shop));
+        $params['storeCurrency'] = pSQL($this->roihunterModule->getStoreCurrency($id_shop));
+        $params['storeLanguage'] = pSQL($this->roihunterModule->getStoreLanguage($id_shop));
+        $params['storeCountry'] = pSQL($this->roihunterModule->getStoreCountry($id_shop));
+        $params['pluginVersion'] = pSQL($this->roihunterModule->getPluginVersion());
+        $params['activeBeProfile'] = pSQL($this->roihunterModule->getActiveBeProfile($id_shop));
         if ($customer_id = $roiHunterStorage->getSystemUserId()) { // potrebuji id_shop??
             $params['customerId'] = pSQL($customer_id);   // int ??
         }
@@ -46,7 +48,7 @@ class AdminRoihunterController extends AdminController {
         Context::getContext()->smarty->assign(
             [
                 'params' => $params,
-                'iframeBaseUrl' => pSQL($this->instance->getIframeUrl($id_shop)),
+                'iframeBaseUrl' => pSQL($this->roihunterModule->getIframeUrl($id_shop)),
             ]
         );
 
@@ -60,7 +62,7 @@ class AdminRoihunterController extends AdminController {
 
     public function setHelperDisplay(Helper $helper) {
         parent::setHelperDisplay($helper);
-        $helper->module = $this->instance;
+        $helper->module = $this->roihunterModule;
 
         $this->helper = $helper;
     }

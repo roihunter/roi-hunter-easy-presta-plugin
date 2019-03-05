@@ -32,11 +32,13 @@ require_once(_PS_MODULE_DIR_ . 'roihunter/classes/storage/storage.php');
 
 class Roihunter extends Module {
 
+    const ROI_HUNTER_MODULE_NAME = 'roihunter';
+
     protected $config_form = false;
     private $roiHunterStorage;
 
     public function __construct() {
-        $this->name = 'roihunter';
+        $this->name = self::ROI_HUNTER_MODULE_NAME;
         $this->tab = 'advertising_marketing';
         $this->version = '1.0.7';
         $this->author = 'prestahost.cz';
@@ -664,6 +666,34 @@ class Roihunter extends Module {
         } else {
             $token = sha1(mt_rand(1, 90000) . _COOKIE_KEY_);
             return base64_encode($token);
+        }
+    }
+
+    /**
+     * Get module instance
+     * @return Roihunter
+     */
+    public static function getModuleInstance() {
+
+        $roihunterModule = parent::getInstanceByName(self::ROI_HUNTER_MODULE_NAME);
+        if ($roihunterModule instanceof Roihunter) {
+            return $roihunterModule;
+        } else {
+            throw new Error("Uninitialized prestashop module " . self::ROI_HUNTER_MODULE_NAME);
+        }
+    }
+
+    /**
+     * true if presta returned module instance
+     * @return bool
+     */
+    public static function isModuleLoaded() {
+
+        $roihunterModule = parent::getInstanceByName(self::ROI_HUNTER_MODULE_NAME);
+        if ($roihunterModule instanceof Roihunter) {
+            return true;
+        } else {
+            return false;
         }
     }
 }
