@@ -41,13 +41,13 @@ class Roihunter extends Module {
         $this->name = self::ROI_HUNTER_MODULE_NAME;
         $this->tab = 'advertising_marketing';
         $this->version = '0.9.0';
-        $this->author = 'prestahost.cz';
+        $this->author = 'ROI Hunter';
         $this->need_instance = 1;
         $this->bootstrap = true;
         parent::__construct();
 
         $this->displayName = $this->l('ROI Hunter Easy');
-        $this->description = $this->l('ROI Hunter Easy pro prestashop');
+        $this->description = $this->l('ROI Hunter Easy addon for PrestaShop');
         $this->confirmUninstall = $this->l('');
         $this->ps_versions_compliancy = ['min' => '1.6', 'max' => _PS_VERSION_];
         $this->roiHunterStorage = ROIHunterStorage::getInstance();
@@ -61,7 +61,7 @@ class Roihunter extends Module {
             $this->registerHook('actionCartSave') &&
             $this->registerHook('displayBackOfficeHeader');
         if ($retval) {
-            $this->installModuleTab('AdminRoihunter', 'Roihunter Easy', 0);
+            $this->installModuleTab('AdminRoihunter', 'ROI Hunter Easy', 0);
             $this->roiHunterStorage->setClientToken($this->getSecureToken());
         }
         return $retval;

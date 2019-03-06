@@ -28,7 +28,7 @@
 	 
 	<br />
 	<p>
-		{l s='This module will boost your sales!' mod='roihunter'}
+		{l s='Create powerful ads for Google and Facebook with ROI Hunter Easy plugin for PrestaShop. Convert past visitors with retargeting and bring new traffic with search ads.' mod='roihunter'}
 	</p>
 </div>
 <!--
