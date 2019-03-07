@@ -40,41 +40,21 @@ if (!is_numeric($page) || $page < RH_FIRST_PRODUCT_PAGE) {
 }
 
 $perpage = 10;
+$offset = $perpage * ($page - RH_FIRST_PRODUCT_PAGE);
 
 $sql = 'SELECT s.id_product, pa.id_product_attribute FROM
     ' . _DB_PREFIX_ . 'product_shop s LEFT JOIN ' . _DB_PREFIX_ . 'product_attribute pa
     ON s.id_product = pa.id_product AND s.id_shop = ' . (int)$id_shop . ' WHERE
-    s.active = 1';
-$hits = Db::getInstance()->executeS($sql);
-$counter = 0;
-$from = ($page - 1) * $perpage;
-$setpage = 1;
-$id_previous = 0;
-
-// strankovani po variantach ale zacina vzdy novym produktem
-$items = [];
-foreach ($hits as $hit) {
-    if ($counter >= $perpage) {
-        $counter = 0;
-        $setpage++;
-    }
-    if ($setpage == $page) {
-        $items[$hit['id_product']][] = $hit;
-    }
-    if ($setpage > $page) {
-        break;
-    }
-    $id_previous = $hit['id_product'];
-    $counter++;
-}
+    s.active = 1 
+    LIMIT ' . $perpage . ' OFFSET ' . $offset;
+$items = Db::getInstance()->executeS($sql);
 
 $json = new ProductJson($roihunterModule);
 $jsonData = [];
-while (list($id_product, $data) = each($items)) {
-    foreach ($data as $item) {
-        $jsonData[] = $json->getJson($id_product, $item['id_product_attribute'], $id_lang, $id_shop);
-    }
+foreach ($items as $item) {
+    $jsonData[] = $json->getJson($item['id_product'], $item['id_product_attribute'], $id_lang, $id_shop);
 }
+
 header("HTTP/1.1 200 OK");
 header("Content-Type:application/json");
 echo json_encode($jsonData);
