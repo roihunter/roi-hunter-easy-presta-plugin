@@ -7,6 +7,7 @@ require_once(_PS_MODULE_DIR_ . 'roihunter/classes/auth/authentication.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/roihunter.php');
 
 const RH_FIRST_PRODUCT_PAGE = 1;
+const RH_PRODUCT_PER_PAGE = 100;
 
 ROIHunterAuthenticator::getInstance()->authenticate();
 
@@ -39,14 +40,13 @@ if (!is_numeric($page) || $page < RH_FIRST_PRODUCT_PAGE) {
     die();
 }
 
-$perpage = 10;
-$offset = $perpage * ($page - RH_FIRST_PRODUCT_PAGE);
+$offset = RH_PRODUCT_PER_PAGE * ($page - RH_FIRST_PRODUCT_PAGE);
 
 $sql = 'SELECT s.id_product, pa.id_product_attribute FROM
     ' . _DB_PREFIX_ . 'product_shop s LEFT JOIN ' . _DB_PREFIX_ . 'product_attribute pa
     ON s.id_product = pa.id_product AND s.id_shop = ' . (int)$id_shop . ' WHERE
     s.active = 1 
-    LIMIT ' . $perpage . ' OFFSET ' . $offset;
+    LIMIT ' . RH_PRODUCT_PER_PAGE . ' OFFSET ' . $offset;
 $items = Db::getInstance()->executeS($sql);
 
 $json = new ProductJson($roihunterModule);
