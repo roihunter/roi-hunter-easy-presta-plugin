@@ -43,7 +43,7 @@ class ProductJson {
 
         $map = ['date_created' => 'date_add', 'date_upd' => 'date_upd', 'date_modified' => 'date_modified',
             'price' => 'price', 'currency' => 'currency', 'visible' => 'active', 'purchasable' => 'available_for_order', 'virtual' => 'is_virtual',
-            'stock_quantity' => 'quantity', 'weight' => 'weight', 'name' => 'name', 'category' => 'category'];
+            'weight' => 'weight', 'name' => 'name', 'category' => 'category'];
         while (list($outkey, $inkey) = each($map)) {
             $retval[$outkey] = $product[$inkey];
         }
@@ -97,6 +97,8 @@ class ProductJson {
                 $retval['additional_images'] = ['id' => $key, 'src' => $image['url']];
             }
         }
+
+        $retval['stock_quantity'] = $this->getProductQuantity($product, $id_product_attribute);
 
         return $retval;
     }
@@ -180,13 +182,14 @@ class ProductJson {
     }
 
     private function getSingleProduct($id_product, $id_lang, $id_shop) {
-        $sql = 'SELECT p.*, product_shop.*, pl.* , m.`name` AS manufacturer_name, s.`name` AS supplier_name
+        $sql = 'SELECT p.*, product_shop.*, pl.* , m.`name` AS manufacturer_name, s.`name` AS supplier_name, sa.quantity
             FROM `' . _DB_PREFIX_ . 'product` p
             ' . Shop::addSqlAssociation('product', 'p') . '
             LEFT JOIN `' . _DB_PREFIX_ . 'product_lang` pl ON (p.`id_product` = pl.`id_product` ' . Shop::addSqlRestrictionOnLang('pl') . ')
             LEFT JOIN `' . _DB_PREFIX_ . 'manufacturer` m ON (m.`id_manufacturer` = p.`id_manufacturer`)
             LEFT JOIN `' . _DB_PREFIX_ . 'supplier` s ON (s.`id_supplier` = p.`id_supplier`) 
-    
+            LEFT JOIN ' . _DB_PREFIX_ . 'stock_available AS sa on (p.id_product=sa.id_product) 
+        
             WHERE pl.`id_lang` = ' . (int)$id_lang . ' AND  p.id_product =' . (int)$id_product;
 
         $rq = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
@@ -226,7 +229,6 @@ class ProductJson {
             ORDER BY pa.`id_product_attribute` LIMIT 100';
 
         $combinations = Db::getInstance()->executeS($sql);
-
         $comb_array = [];
 
         if (is_array($combinations)) {
@@ -335,5 +337,13 @@ class ProductJson {
         }
     }
 
+    private function getProductQuantity($product, $id_product_attribute) {
+
+        if (isset($id_product_attribute)) { // product combination
+            return $product['attributes'][$id_product_attribute]['quantity'];
+        } else {
+            return $product['quantity'];    // regular product
+        }
+    }
 }
  
