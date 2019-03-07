@@ -13,7 +13,6 @@ ROIHunterAuthenticator::getInstance()->authenticate();
 
 $roihunterModule = Roihunter::getModuleInstance();
 
-Context::getContext()->shop->id = $id_shop;
 $id_shop = $roihunterModule->getShopFromUrl($_SERVER['HTTP_HOST']);
 Context::getContext()->shop->id = $id_shop;
 
