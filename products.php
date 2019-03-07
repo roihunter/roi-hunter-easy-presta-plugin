@@ -6,6 +6,8 @@ require_once(_PS_MODULE_DIR_ . 'roihunter/classes/ProductJson.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/auth/authentication.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/roihunter.php');
 
+const RH_FIRST_PRODUCT_PAGE = 1;
+
 ROIHunterAuthenticator::getInstance()->authenticate();
 
 $roihunterModule = Roihunter::getModuleInstance();
@@ -28,9 +30,14 @@ $page = (int)$data['page']?(int)$data['page']:1;
 
 $id_lang = (int)$data['id_lang']?(int)$data['id_lang']:(int)Configuration::get('PS_LANG_DEFAULT', null, null, $id_shop);
 */
-$page = (isset($_GET['page']) && (int)$_GET['page']) ? (int)$_GET['page'] : 1;
 $id_lang = (isset($_GET['id_lang']) && (int)$_GET['id_lang']) ? (int)$_GET['id_lang'] : (int)Configuration::get('PS_LANG_DEFAULT', null, null, $id_shop);
 
+$page = (isset($_GET['page']) ? (int) $_GET['page'] : RH_FIRST_PRODUCT_PAGE);
+if (!is_numeric($page) || $page < RH_FIRST_PRODUCT_PAGE) {
+    header("HTTP/1.1 400 Bad Request");
+    echo "Page parameter is not valid.";
+    die();
+}
 
 $perpage = 10;
 
