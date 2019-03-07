@@ -23,8 +23,8 @@ class ProductJson {
         }
         $product = $this->product;
         $specific_price = [];
-        $product['regular_price'] = Product::getPriceStatic($product['id_product'], true, (!empty($id_product_attribute) ? intval($product['id_product_attribute']) : null), 2, null, false, false, 1, false, null, null, null);
-        $product['price'] = Product::getPriceStatic($product['id_product'], true, (!empty($id_product_attribute) ? intval($product['id_product_attribute']) : null), 2, null, false, true, 1, false, null, null, null, $specific_price);
+        $product['regular_price'] = Product::getPriceStatic($product['id_product'], true, $id_product_attribute, 2, null, false, false, 1, false, null, null, null);
+        $product['price'] = Product::getPriceStatic($product['id_product'], true, $id_product_attribute, 2, null, false, true, 1, false, null, null, null, $specific_price);
         $product['currency'] = Context::getContext()->currency->iso_code;
         if ($id_product_attribute) {
             $product['attributes'] = $this->getProductAttributes($id_product, $id_product_attribute, $id_lang, $id_shop);
@@ -41,7 +41,7 @@ class ProductJson {
             $retval['id'] = $product['id_product'];
         }
 
-        $map = ['date_created' => 'date_add', 'date_upd' => 'date_upd', 'date_modified' => 'date_modified',
+        $map = ['date_created' => 'date_add', 'date_upd' => 'date_upd',
             'price' => 'price', 'currency' => 'currency', 'visible' => 'active', 'purchasable' => 'available_for_order', 'virtual' => 'is_virtual',
             'weight' => 'weight', 'name' => 'name', 'category' => 'category'];
         while (list($outkey, $inkey) = each($map)) {
