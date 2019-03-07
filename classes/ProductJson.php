@@ -90,7 +90,9 @@ class ProductJson {
                 $cover = $defaultcover;
         }
 
-        $retval['image'] = ['id' => $cover, 'src' => $product['images'][$cover]['url']];
+        if (isset($retval['image'])) {
+            $retval['image'] = ['id' => $cover, 'src' => $product['images'][$cover]['url']];
+        }
         reset($product['images']);
         while (list($key, $image) = each($product['images'])) {
             if ($key != $cover && ($id_product_attribute == 0 || in_array($id_product_attribute, $image['attributes']))) {
