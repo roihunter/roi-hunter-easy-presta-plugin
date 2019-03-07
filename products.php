@@ -45,6 +45,7 @@ $sql = 'SELECT s.id_product, pa.id_product_attribute FROM
     ' . _DB_PREFIX_ . 'product_shop s LEFT JOIN ' . _DB_PREFIX_ . 'product_attribute pa
     ON s.id_product = pa.id_product AND s.id_shop = ' . (int)$id_shop . ' WHERE
     s.active = 1 
+    ORDER BY s.id_product, pa.id_product_attribute 
     LIMIT ' . RH_PRODUCT_PER_PAGE . ' OFFSET ' . $offset;
 $items = Db::getInstance()->executeS($sql);
 
