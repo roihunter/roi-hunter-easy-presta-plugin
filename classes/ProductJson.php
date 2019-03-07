@@ -5,7 +5,7 @@ class ProductJson {
     protected $current_id_product = 0;
     protected $instance;
     protected $categoryCache = [];
-    protected static $_separator = ' | ';
+    protected static $_separator = ' > ';
 
     public function __construct($instance) {
         $this->instance = $instance;
