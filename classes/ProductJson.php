@@ -23,8 +23,8 @@ class ProductJson {
         }
         $product = $this->product;
         $specific_price = [];
-        $product['regular_price'] = Product::getPriceStatic($product['id_product'], true, (!empty($id_product_attribute) ? intval($product['id_product_attribute']) : null), 2, null, false, false, 1, false, null, null, null);
-        $product['price'] = Product::getPriceStatic($product['id_product'], true, (!empty($id_product_attribute) ? intval($product['id_product_attribute']) : null), 2, null, false, true, 1, false, null, null, null, $specific_price);
+        $product['regular_price'] = Product::getPriceStatic($product['id_product'], true, $id_product_attribute, 2, null, false, false, 1, false, null, null, null);
+        $product['price'] = Product::getPriceStatic($product['id_product'], true, $id_product_attribute, 2, null, false, true, 1, false, null, null, null, $specific_price);
         $product['currency'] = Context::getContext()->currency->iso_code;
         if ($id_product_attribute) {
             $product['attributes'] = $this->getProductAttributes($id_product, $id_product_attribute, $id_lang, $id_shop);
@@ -41,9 +41,9 @@ class ProductJson {
             $retval['id'] = $product['id_product'];
         }
 
-        $map = ['date_created' => 'date_add', 'date_upd' => 'date_upd', 'date_modified' => 'date_modified',
+        $map = ['date_created' => 'date_add', 'date_upd' => 'date_upd',
             'price' => 'price', 'currency' => 'currency', 'visible' => 'active', 'purchasable' => 'available_for_order', 'virtual' => 'is_virtual',
-            'stock_quantity' => 'quantity', 'weight' => 'weight', 'name' => 'name', 'category' => 'category'];
+            'weight' => 'weight', 'name' => 'name', 'category' => 'category'];
         while (list($outkey, $inkey) = each($map)) {
             $retval[$outkey] = $product[$inkey];
         }
@@ -90,13 +90,17 @@ class ProductJson {
                 $cover = $defaultcover;
         }
 
-        $retval['image'] = ['id' => $cover, 'src' => $product['images'][$cover]['url']];
+        if (isset($retval['image'])) {
+            $retval['image'] = ['id' => $cover, 'src' => $product['images'][$cover]['url']];
+        }
         reset($product['images']);
         while (list($key, $image) = each($product['images'])) {
             if ($key != $cover && ($id_product_attribute == 0 || in_array($id_product_attribute, $image['attributes']))) {
                 $retval['additional_images'] = ['id' => $key, 'src' => $image['url']];
             }
         }
+
+        $retval['stock_quantity'] = $this->getProductQuantity($product, $id_product_attribute);
 
         return $retval;
     }
@@ -180,13 +184,14 @@ class ProductJson {
     }
 
     private function getSingleProduct($id_product, $id_lang, $id_shop) {
-        $sql = 'SELECT p.*, product_shop.*, pl.* , m.`name` AS manufacturer_name, s.`name` AS supplier_name
+        $sql = 'SELECT p.*, product_shop.*, pl.* , m.`name` AS manufacturer_name, s.`name` AS supplier_name, sa.quantity
             FROM `' . _DB_PREFIX_ . 'product` p
             ' . Shop::addSqlAssociation('product', 'p') . '
             LEFT JOIN `' . _DB_PREFIX_ . 'product_lang` pl ON (p.`id_product` = pl.`id_product` ' . Shop::addSqlRestrictionOnLang('pl') . ')
             LEFT JOIN `' . _DB_PREFIX_ . 'manufacturer` m ON (m.`id_manufacturer` = p.`id_manufacturer`)
             LEFT JOIN `' . _DB_PREFIX_ . 'supplier` s ON (s.`id_supplier` = p.`id_supplier`) 
-    
+            LEFT JOIN ' . _DB_PREFIX_ . 'stock_available AS sa on (p.id_product=sa.id_product) 
+        
             WHERE pl.`id_lang` = ' . (int)$id_lang . ' AND  p.id_product =' . (int)$id_product;
 
         $rq = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
@@ -226,7 +231,6 @@ class ProductJson {
             ORDER BY pa.`id_product_attribute` LIMIT 100';
 
         $combinations = Db::getInstance()->executeS($sql);
-
         $comb_array = [];
 
         if (is_array($combinations)) {
@@ -335,5 +339,13 @@ class ProductJson {
         }
     }
 
+    private function getProductQuantity($product, $id_product_attribute) {
+
+        if (isset($id_product_attribute)) { // product combination
+            return $product['attributes'][$id_product_attribute]['quantity'];
+        } else {
+            return $product['quantity'];    // regular product
+        }
+    }
 }
  
