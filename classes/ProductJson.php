@@ -90,7 +90,7 @@ class ProductJson {
                 $cover = $defaultcover;
         }
 
-        if (isset($retval['image'])) {
+        if (isset($product['images']) && !empty($product['images'])) {
             $retval['image'] = ['id' => $cover, 'src' => $product['images'][$cover]['url']];
         }
         reset($product['images']);
