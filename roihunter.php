@@ -439,7 +439,7 @@ class Roihunter extends Module {
          * If values have been submitted in the form, process.
          */
         if (((bool)Tools::isSubmit('submitRoihunterModule')) == true) {
-            $this->postProcess();
+            $this->saveFormInConfiguration();
         }
 
         $this->context->smarty->assign('module_dir', $this->_path);
@@ -483,7 +483,7 @@ class Roihunter extends Module {
         $helper->token = Tools::getAdminTokenLite('AdminModules');
 
         $helper->tpl_vars = [
-            'fields_value' => $this->getConfigFormValues(), /* Add values for your inputs */
+            'fields_value' => [ROIHunterStorage::RH_ACTIVE_BE_PROFILE => $this->roiHunterStorage->isActiveBeProfileProduction()], // form values in configuration
             'languages' => $this->context->controller->getLanguages(),
             'id_language' => $this->context->language->id,
         ];
@@ -521,7 +521,6 @@ class Roihunter extends Module {
                             ],
                         ],
                     ],
-
                 ],
                 'submit' => [
                     'title' => $this->l('Save'),
@@ -530,25 +529,11 @@ class Roihunter extends Module {
         ];
     }
 
-    /**
-     * Set values for the inputs.
-     */
-    protected function getConfigFormValues() {
-        return [ROIHunterStorage::RH_ACTIVE_BE_PROFILE => $this->roiHunterStorage->getActiveBeProfile()];
-    }
-
-    /**
-     * Save form data.
-     */
-    protected function postProcess() {
-        $form_values = $this->getConfigFormValues();
-        $integers = [ROIHunterStorage::RH_ACTIVE_BE_PROFILE];
-        foreach (array_keys($form_values) as $key) {
-            if (in_array($key, $integers)) {
-                Configuration::updateValue($key, (int)Tools::getValue($key));
-            } else {
-                Configuration::updateValue($key, Tools::getValue($key));
-            }
+    protected function saveFormInConfiguration() {
+        if ((int)Tools::getValue(ROIHunterStorage::RH_ACTIVE_BE_PROFILE)) {
+            $this->roiHunterStorage->setActiveBeProfile(ROIHunterStorage::RH_ACTIVE_BE_PROFILE_PRODUCTION);
+        } else {
+            $this->roiHunterStorage->setActiveBeProfile(ROIHunterStorage::RH_ACTIVE_BE_PROFILE_STAGING);
         }
     }
 
