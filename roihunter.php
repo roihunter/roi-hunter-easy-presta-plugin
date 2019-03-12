@@ -77,18 +77,10 @@ class Roihunter extends Module {
     /************************** hooks start ******************************/
 
     public function hookDisplayFooter($params) {
-        $id_shop = Context::getContext()->shop->id;
 
         $google_conversion_id = $this->roiHunterStorage->getGoogleConversionId();
         $google_conversion_label = $this->roiHunterStorage->getGoogleConversionLabel();
         $fb_pixel_id = $this->roiHunterStorage->getFbPixelId();
-        $profile = $this->getActiveBeProfile();
-        if ($profile == 'developer') {
-            $google_conversion_id = empty($google_conversion_id) ? 'MOCKGID' : $google_conversion_id;
-            $google_conversion_label = empty($google_conversion_label) ? 'MOCKGCONVL' : $google_conversion_label;
-            $fb_pixel_id = empty($fb_pixel_id) ? 'MOCKFPID' : $fb_pixel_id;
-        }
-
 
         $output = '';
         if (empty($google_conversion_id) && empty($fb_pixel_id)) {
@@ -333,16 +325,9 @@ class Roihunter extends Module {
     }
 
     public function hookHeader() {
-        $id_shop = Shop::isFeatureActive() ? Context::getContext()->shop->id : null;
         $this->context->controller->addJS($this->_path . '/views/js/front.js');
         $this->context->controller->addCSS($this->_path . '/views/css/front.css');
         $fb_pixel_id = $this->roiHunterStorage->getFbPixelId();
-        $profile = $this->getActiveBeProfile($id_shop);
-        if ($profile == 'developer') {
-            $google_conversion_id = empty($google_conversion_id) ? 'MOCKGID' : $google_conversion_id;
-            $google_conversion_label = empty($google_conversion_label) ? 'MOCKGCONVL' : $google_conversion_label;
-            $fb_pixel_id = empty($fb_pixel_id) ? 'MOCKFPID' : $fb_pixel_id;
-        }
         if (!empty($fb_pixel_id)) {
             $this->context->controller->addJS('https://storage.googleapis.com/goostav-static-files/rheasy-fbq-wrapper.js');
         }
@@ -416,25 +401,12 @@ class Roihunter extends Module {
         return 'prestashop_' . $this->version;
     }
 
-    public function getActiveBeProfile($id_shop = null) {
-        switch (Configuration::get(ROIHunterStorage::RH_ACTIVE_BE_PROFILE, null, null, $id_shop)) {
-            case 0:
-                return 'staging';
-            case 1:
-                return 'production';
-            case 2:
-                return 'developer';
+    public function getIframeUrl() {
+        if ($this->roiHunterStorage->isActiveBeProfileProduction()) {
+            return 'https://magento.roihunter.com';
+        } else {
+            return 'https://goostav-fe-staging.roihunter.com';
         }
-    }
-
-    public function getIframeUrl($id_shop) {
-        switch (Configuration::get(ROIHunterStorage::RH_ACTIVE_BE_PROFILE, null, null, $id_shop)) {
-            case 0:
-                return 'https://goostav-fe-staging.roihunter.com'; // staging
-            case 1:
-                return 'https://magento.roihunter.com';
-        }
-
     }
 
     /************************** controller end ******************************/
@@ -562,10 +534,7 @@ class Roihunter extends Module {
      * Set values for the inputs.
      */
     protected function getConfigFormValues() {
-        return [
-            ROIHunterStorage::RH_ACTIVE_BE_PROFILE => Configuration::get(ROIHunterStorage::RH_ACTIVE_BE_PROFILE),
-
-        ];
+        return [ROIHunterStorage::RH_ACTIVE_BE_PROFILE => $this->roiHunterStorage->getActiveBeProfile()];
     }
 
     /**

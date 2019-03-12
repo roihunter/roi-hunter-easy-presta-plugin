@@ -17,6 +17,9 @@ class ROIHunterStorage {
         self::RH_GOOGLE_CONVERSION_LABEL,
         self::RH_FB_PIXEL_ID];
 
+    const RH_ACTIVE_BE_PROFILE_PRODUCTION = 'production';
+    const RH_ACTIVE_BE_PROFILE_STAGING = 'staging';
+
     private static $instance;
 
     private $shopId;
@@ -95,6 +98,14 @@ class ROIHunterStorage {
 
     public function setClientToken($value) {
         $this->saveConfigFormValue(self::RH_CLIENT_TOKEN, $value);
+    }
+
+    public function getActiveBeProfile() {
+        return $this->getConfigFormValue(self::RH_ACTIVE_BE_PROFILE);
+    }
+
+    public function isActiveBeProfileProduction() {
+        return $this->getConfigFormValue(self::RH_ACTIVE_BE_PROFILE) == self::RH_ACTIVE_BE_PROFILE_PRODUCTION;
     }
 
     private function saveConfigFormValue($key, $value) {
