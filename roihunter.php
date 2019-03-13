@@ -29,6 +29,7 @@ if (!defined('_PS_VERSION_')) {
 }
 
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/storage/storage.php');
+require_once(_PS_MODULE_DIR_ . 'roihunter/classes/js/RhTrackingScriptLoader.php');
 
 class Roihunter extends Module {
 
@@ -86,6 +87,8 @@ class Roihunter extends Module {
         if (empty($google_conversion_id) && empty($fb_pixel_id)) {
             return $output;
         }
+
+        $output .= RhTrackingScriptLoader::getInstance()->generateJsScriptOutput();
 
         // overit ze nekoliduje s nasledujicimi udalostmi
         $cart_inner = $this->addCartActionDelayed($google_conversion_id, $fb_pixel_id);
