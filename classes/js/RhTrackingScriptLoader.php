@@ -1,6 +1,7 @@
 <?php
 
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/storage/storage.php');
+require_once(_PS_MODULE_DIR_ . 'roihunter/classes/js/PageTypeTracker.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/js/ProductViewTracker.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/js/AddToCartTracker.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/js/OrderTracker.php');
@@ -10,12 +11,16 @@ class RhTrackingScriptLoader {
     private static $instance;
 
     private $roiHunterStorage;
+    private $pageTypeTracker;
     private $productViewTracker;
     private $addToCartTracker;
     private $orderTracker;
 
+    private $pageType;
+
     private function __construct() {
         $this->roiHunterStorage = ROIHunterStorage::getInstance();
+        $this->pageTypeTracker = PageTypeTracker::getInstance();
         $this->productViewTracker = ProductViewTracker::getInstance();
         $this->addToCartTracker = AddToCartTracker::getInstance();
         $this->orderTracker = OrderTracker::getInstance();
@@ -32,6 +37,7 @@ class RhTrackingScriptLoader {
     public function generateJsScriptOutput() {
 
         $resultJs = $this->generateRhEasyTypeJs();
+        $resultJs .= $this->pageTypeTracker->generateJsScriptOutput($this->pageType);
         $resultJs .= $this->productViewTracker->generateJsScriptOutput();
         $resultJs .= $this->addToCartTracker->generateJsScriptOutput();
         $resultJs .= $this->orderTracker->generateJsScriptOutput();
@@ -57,5 +63,11 @@ class RhTrackingScriptLoader {
         } else {
             return '<script src="https://storage.googleapis.com/goostav-static-files/rh-easy-events-tracking-staging.umd.js" async></script>';
         }
+    }
+
+    /* Setters */
+
+    public function setPageType($pageType) {
+        $this->pageType = $pageType;
     }
 }

@@ -30,6 +30,7 @@ if (!defined('_PS_VERSION_')) {
 
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/storage/storage.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/js/RhTrackingScriptLoader.php');
+require_once(_PS_MODULE_DIR_ . 'roihunter/enums/EPageType.php');
 
 class Roihunter extends Module {
 
@@ -88,7 +89,9 @@ class Roihunter extends Module {
             return $output;
         }
 
-        $output .= RhTrackingScriptLoader::getInstance()->generateJsScriptOutput();
+        $rhTrackingScriptLoader = RhTrackingScriptLoader::getInstance();
+        $rhTrackingScriptLoader->setPageType(EPageType::fromPrestaShopController(Tools::getValue('controller')));
+        $output .= $rhTrackingScriptLoader->generateJsScriptOutput();
 
         // overit ze nekoliduje s nasledujicimi udalostmi
         $cart_inner = $this->addCartActionDelayed($google_conversion_id, $fb_pixel_id);
