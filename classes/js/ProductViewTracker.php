@@ -20,8 +20,36 @@ class ProductViewTracker {
         return self::$instance;
     }
 
-    public function generateJsScriptOutput() {
+    /**
+     * Generate rh easy product view js
+     * @param $rhEasyProductDto RhEasyProductDto
+     * @return string javascript with product
+     */
+    public function generateJsScriptOutput($rhEasyProductDto) {
 
-        return '';
+        if (isset($rhEasyProductDto)) { // generate onProductViewed with product
+
+            return '<script>
+    if (window.RhEasy) {
+        window.RhEasy.onProductViewed = {
+            "add" : function (f) {
+                f({"product" : ' . $rhEasyProductDto->toJson() . '}); 
+                return true;
+            }
+        };
+    }
+</script>';
+
+        } else {                        // generate onProductViewed without product
+            return '<script>
+    if (window.RhEasy) {
+        window.RhEasy.onProductViewed = {
+            "add" : function (f) {
+                return true;
+            }
+        };
+    }
+</script>';
+        }
     }
 }

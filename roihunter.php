@@ -30,6 +30,7 @@ if (!defined('_PS_VERSION_')) {
 
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/storage/storage.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/js/RhTrackingScriptLoader.php');
+require_once(_PS_MODULE_DIR_ . 'roihunter/classes/dtos/RhEasyProductDto.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/enums/EPageType.php');
 
 class Roihunter extends Module {
@@ -90,7 +91,14 @@ class Roihunter extends Module {
         }
 
         $rhTrackingScriptLoader = RhTrackingScriptLoader::getInstance();
-        $rhTrackingScriptLoader->setPageType(EPageType::fromPrestaShopController(Tools::getValue('controller')));
+
+        $pageType = EPageType::fromPrestaShopController(Tools::getValue('controller'));
+        $rhTrackingScriptLoader->setPageType($pageType);
+
+        if ($pageType == EPageType::PRODUCT) {
+            $rhTrackingScriptLoader->setRhEasyProductDto($this->createRhEasyProductDto());
+        }
+
         $output .= $rhTrackingScriptLoader->generateJsScriptOutput();
 
         // overit ze nekoliduje s nasledujicimi udalostmi
@@ -98,28 +106,7 @@ class Roihunter extends Module {
         $cart_inner_google = isset($cart_inner['google']) ? $cart_inner['google'] : '';
         $cart_fb = isset($cart_inner['fb']) ? $cart_inner['fb'] : '';
 
-        if (Tools::getValue('controller') == 'product' && (int)Tools::getValue('id_product')) {
-            $product = $this->getProductData((int)Tools::getValue('id_product'));
-            if (!empty($google_conversion_id)) {
-                $this->context->smarty->assign(
-                    [
-                        ROIHunterStorage::RH_GOOGLE_CONVERSION_ID => $google_conversion_id,
-                        'gid_product' => $product['id_product'],
-                        'inner_cart' => $cart_inner_google,
-                        'gid_price' => $product['price'],
-                    ]);
-                $output .= $this->context->smarty->fetch($this->local_path . 'views/templates/front/gid_product.tpl');
-            }
-            if (!empty($fb_pixel_id)) {
-                $iso = Context::getContext()->currency->iso_code;
-                $this->context->smarty->assign([
-                    ROIHunterStorage::RH_FB_PIXEL_ID => $fb_pixel_id,
-                    'currency' => $iso,
-                    'fid_product' => $product['id_product'],
-                    'fb_price' => $product['price']]);
-                $output .= $this->context->smarty->fetch($this->local_path . 'views/templates/front/fb_product.tpl');
-            }
-        } else if (Tools::getValue('controller') == 'category' && (int)Tools::getValue('id_category') && !empty($google_conversion_id)) {
+        if (Tools::getValue('controller') == 'category' && (int)Tools::getValue('id_category') && !empty($google_conversion_id)) {
             $id_category = (int)Tools::getValue('id_category');
             $ref = new ReflectionObject(Context::getContext()->controller);
 
@@ -267,20 +254,6 @@ class Roihunter extends Module {
         }
         return $output;
     }
-
-    private function getProductData($id_product) {
-        $price = Product::getPriceStatic($id_product, $this->useTax());
-        $sql = 'SELECT name FROM ' . _DB_PREFIX_ . 'product_lang WHERE id_product =' . (int)$id_product . ' AND
-            id_lang =' . Context::getContext()->language->id;
-        $name = Db::getInstance()->getValue($sql);
-        $retval = [
-            'id_product' => $id_product,
-            'product_name' => $name,
-            'price' => $this->roundPrice($price),
-        ];
-        return $retval;
-    }
-
 
     private function getOrderData($id_order) {
         $order = new Order($id_order);
@@ -654,6 +627,28 @@ class Roihunter extends Module {
             return true;
         } else {
             return false;
+        }
+    }
+
+    /**
+     * Get viewed product from DB based on ID in from $_POST
+     * @return RhEasyProductDto
+     */
+    private function createRhEasyProductDto() {
+
+        $id_product = (int)Tools::getValue('id_product');
+        if ($id_product) {
+
+            $sql = 'SELECT name FROM ' . _DB_PREFIX_ . 'product_lang WHERE id_product =' . (int)$id_product . ' AND id_lang =' . Context::getContext()->language->id;
+            $name = Db::getInstance()->getValue($sql);
+
+            $price = Product::getPriceStatic($id_product, $this->useTax());
+
+            $currency = Context::getContext()->currency->iso_code;
+
+            return new RhEasyProductDto($id_product, $name, $this->roundPrice($price), $currency);
+        } else {
+            return null;
         }
     }
 }
