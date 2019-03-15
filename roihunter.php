@@ -32,6 +32,7 @@ require_once(_PS_MODULE_DIR_ . 'roihunter/classes/storage/storage.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/js/RhTrackingScriptLoader.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/dtos/RhEasyProductDto.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/dtos/RhEasyCategoryDto.php');
+require_once(_PS_MODULE_DIR_ . 'roihunter/classes/dtos/RhEasyPageDto.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/enums/EPageType.php');
 
 class Roihunter extends Module {
@@ -94,7 +95,7 @@ class Roihunter extends Module {
         $rhTrackingScriptLoader = RhTrackingScriptLoader::getInstance();
 
         $pageType = EPageType::fromPrestaShopController(Tools::getValue('controller'));
-        $rhTrackingScriptLoader->setPageType($pageType);
+        $rhTrackingScriptLoader->setRhEasyPageDto(new RhEasyPageDto($pageType));
 
         if ($pageType == EPageType::PRODUCT) {
             $rhTrackingScriptLoader->setRhEasyProductDto($this->createRhEasyProductDto());

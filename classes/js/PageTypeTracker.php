@@ -6,10 +6,7 @@ class PageTypeTracker {
 
     private static $instance;
 
-    private $roiHunterStorage;
-
     private function __construct() {
-        $this->roiHunterStorage = ROIHunterStorage::getInstance();
     }
 
     public static function getInstance() {
@@ -23,20 +20,34 @@ class PageTypeTracker {
     /**
      * Generate on page loaded script with page type.
      * Script immediately invoke function f passed in window.RhEasy.onPageLoaded.add(f);
-     * @param $pageType string EPageType value.
+     * @param $rhEasyPageDto RhEasyPageDto page.
      * @return string Javascript with prepared page type.
      */
-    public function generateJsScriptOutput($pageType) {
+    public function generateJsScriptOutput($rhEasyPageDto) {
 
-        return '<script>
+        if (isset($rhEasyPageDto)) {
+
+            return '<script>
     if (window.RhEasy) {
         window.RhEasy.onPageLoaded = { 
             "add" : function (f) { 
-                f({"page" : "' . $pageType . '"}); 
+                f({"' . $rhEasyPageDto->toJson() . '"});
                 return true;
             }
         };
     }
 </script>';
+        } else {
+
+            return '<script>
+    if (window.RhEasy) {
+        window.RhEasy.onPageLoaded = { 
+            "add" : function (f) { 
+                return true;
+            }
+        };
+    }
+</script>';
+        }
     }
 }

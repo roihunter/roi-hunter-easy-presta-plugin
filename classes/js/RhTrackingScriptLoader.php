@@ -1,6 +1,7 @@
 <?php
 
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/storage/storage.php');
+require_once(_PS_MODULE_DIR_ . 'roihunter/classes/dtos/RhEasyDto.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/js/PageTypeTracker.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/js/ProductViewTracker.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/js/CategoryViewTracker.php');
@@ -18,7 +19,7 @@ class RhTrackingScriptLoader {
     private $addToCartTracker;
     private $orderTracker;
 
-    private $pageType;
+    private $rhEasyPageDto;
     private $rhEasyProductDto;
     private $rhEasyCategoryDto;
 
@@ -41,8 +42,8 @@ class RhTrackingScriptLoader {
 
     public function generateJsScriptOutput() {
 
-        $resultJs = $this->generateRhEasyTypeJs();
-        $resultJs .= $this->pageTypeTracker->generateJsScriptOutput($this->pageType);
+        $resultJs = $this->generateRhEasyObjectJs();
+        $resultJs .= $this->pageTypeTracker->generateJsScriptOutput($this->rhEasyPageDto);
         $resultJs .= $this->productViewTracker->generateJsScriptOutput($this->rhEasyProductDto);
         $resultJs .= $this->categoryViewTracker->generateJsScriptOutput($this->rhEasyCategoryDto);
         $resultJs .= $this->addToCartTracker->generateJsScriptOutput();
@@ -51,13 +52,17 @@ class RhTrackingScriptLoader {
         return $resultJs;
     }
 
-    private function generateRhEasyTypeJs() {
+    private function generateRhEasyObjectJs() {
+
+        $rhEasy = new RhEasyDto(
+            "PRESTA_SHOP",
+            $this->roiHunterStorage->getGoogleConversionId(),
+            $this->roiHunterStorage->getGoogleConversionLabel(),
+            $this->roiHunterStorage->getFbPixelId());
 
         return '<script>
     if (!window.RhEasy) { 
-        window.RhEasy = {
-            "platform" : "PRESTA_SHOP",
-        };
+        window.RhEasy = ' . $rhEasy->toJson() . ';
     }
 </script>';
     }
@@ -73,8 +78,8 @@ class RhTrackingScriptLoader {
 
     /* Setters */
 
-    public function setPageType($pageType) {
-        $this->pageType = $pageType;
+    public function setRhEasyPageDto($rhEasyPageDto) {
+        $this->rhEasyPageDto = $rhEasyPageDto;
     }
 
     public function setRhEasyProductDto($rhEasyProductDto) {
