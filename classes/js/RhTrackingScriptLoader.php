@@ -19,7 +19,7 @@ class RhTrackingScriptLoader {
     private $addToCartTracker;
     private $orderTracker;
 
-    private $pageType;
+    private $rhEasyPageDto;
     private $rhEasyProductDto;
     private $rhEasyCategoryDto;
 
@@ -43,7 +43,7 @@ class RhTrackingScriptLoader {
     public function generateJsScriptOutput() {
 
         $resultJs = $this->generateRhEasyObjectJs();
-        $resultJs .= $this->pageTypeTracker->generateJsScriptOutput($this->pageType);
+        $resultJs .= $this->pageTypeTracker->generateJsScriptOutput($this->rhEasyPageDto);
         $resultJs .= $this->productViewTracker->generateJsScriptOutput($this->rhEasyProductDto);
         $resultJs .= $this->categoryViewTracker->generateJsScriptOutput($this->rhEasyCategoryDto);
         $resultJs .= $this->addToCartTracker->generateJsScriptOutput();
@@ -78,8 +78,8 @@ class RhTrackingScriptLoader {
 
     /* Setters */
 
-    public function setPageType($pageType) {
-        $this->pageType = $pageType;
+    public function setRhEasyPageDto($rhEasyPageDto) {
+        $this->rhEasyPageDto = $rhEasyPageDto;
     }
 
     public function setRhEasyProductDto($rhEasyProductDto) {
