@@ -3,6 +3,7 @@
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/storage/storage.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/js/PageTypeTracker.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/js/ProductViewTracker.php');
+require_once(_PS_MODULE_DIR_ . 'roihunter/classes/js/CategoryViewTracker.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/js/AddToCartTracker.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/js/OrderTracker.php');
 
@@ -13,16 +14,19 @@ class RhTrackingScriptLoader {
     private $roiHunterStorage;
     private $pageTypeTracker;
     private $productViewTracker;
+    private $categoryViewTracker;
     private $addToCartTracker;
     private $orderTracker;
 
     private $pageType;
     private $rhEasyProductDto;
+    private $rhEasyCategoryDto;
 
     private function __construct() {
         $this->roiHunterStorage = ROIHunterStorage::getInstance();
         $this->pageTypeTracker = PageTypeTracker::getInstance();
         $this->productViewTracker = ProductViewTracker::getInstance();
+        $this->categoryViewTracker = CategoryViewTracker::getInstance();
         $this->addToCartTracker = AddToCartTracker::getInstance();
         $this->orderTracker = OrderTracker::getInstance();
     }
@@ -40,6 +44,7 @@ class RhTrackingScriptLoader {
         $resultJs = $this->generateRhEasyTypeJs();
         $resultJs .= $this->pageTypeTracker->generateJsScriptOutput($this->pageType);
         $resultJs .= $this->productViewTracker->generateJsScriptOutput($this->rhEasyProductDto);
+        $resultJs .= $this->categoryViewTracker->generateJsScriptOutput($this->rhEasyCategoryDto);
         $resultJs .= $this->addToCartTracker->generateJsScriptOutput();
         $resultJs .= $this->orderTracker->generateJsScriptOutput();
         $resultJs .= $this->generateRhEasyEventsTrackingJs();
@@ -74,5 +79,9 @@ class RhTrackingScriptLoader {
 
     public function setRhEasyProductDto($rhEasyProductDto) {
         $this->rhEasyProductDto = $rhEasyProductDto;
+    }
+
+    public function setRhEasyCategoryDto($rhEasyCategoryDto) {
+        $this->rhEasyCategoryDto = $rhEasyCategoryDto;
     }
 }

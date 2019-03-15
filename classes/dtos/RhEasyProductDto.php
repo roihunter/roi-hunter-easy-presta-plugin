@@ -2,12 +2,14 @@
 
 class RhEasyProductDto {
 
-    private $productId;
-    private $name;
-    private $price;
-    private $currency;
+    //dto has public fields because json_encode()
 
-    public function __construct($productId, $name, $price, $currency) {
+    public $productId;
+    public $name;
+    public $price;
+    public $currency;
+
+    public function __construct($productId, $name = null, $price = null, $currency = null) {
         $this->productId = $productId;
         $this->name = $name;
         $this->price = $price;
@@ -15,6 +17,6 @@ class RhEasyProductDto {
     }
 
     public function toJson() {
-        return json_encode(get_object_vars($this));
+        return json_encode($this);
     }
 }
