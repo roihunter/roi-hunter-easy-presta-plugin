@@ -31,6 +31,7 @@ if (!defined('_PS_VERSION_')) {
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/storage/storage.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/js/RhTrackingScriptLoader.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/dtos/RhEasyProductDto.php');
+require_once(_PS_MODULE_DIR_ . 'roihunter/classes/dtos/RhEasyCategoryDto.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/enums/EPageType.php');
 
 class Roihunter extends Module {
@@ -98,6 +99,9 @@ class Roihunter extends Module {
         if ($pageType == EPageType::PRODUCT) {
             $rhTrackingScriptLoader->setRhEasyProductDto($this->createRhEasyProductDto());
         }
+        if ($pageType == EPageType::CATEGORY) {
+            $rhTrackingScriptLoader->setRhEasyCategoryDto($this->createRhEasyCategoryDto());
+        }
 
         $output .= $rhTrackingScriptLoader->generateJsScriptOutput();
 
@@ -106,31 +110,7 @@ class Roihunter extends Module {
         $cart_inner_google = isset($cart_inner['google']) ? $cart_inner['google'] : '';
         $cart_fb = isset($cart_inner['fb']) ? $cart_inner['fb'] : '';
 
-        if (Tools::getValue('controller') == 'category' && (int)Tools::getValue('id_category') && !empty($google_conversion_id)) {
-            $id_category = (int)Tools::getValue('id_category');
-            $ref = new ReflectionObject(Context::getContext()->controller);
-
-            if ($ref->hasProperty('cat_products')) {
-                $prop = $ref->getProperty('cat_products');
-                $prop->setAccessible(true);
-                $products = $prop->getValue(Context::getContext()->controller);
-                $itemids = '';
-                foreach ($products as $p) {
-                    $itemids .= $p['id_product'] . ',';
-                }
-                $itemids = substr($itemids, 0, -1);
-            }
-
-            if (!empty($google_conversion_id)) {
-                $this->context->smarty->assign(
-                    [
-                        ROIHunterStorage::RH_GOOGLE_CONVERSION_ID => $google_conversion_id,
-                        'inner_cart' => $cart_inner_google,
-                        'gid_product' => $itemids,
-                    ]);
-                $output .= $this->context->smarty->fetch($this->local_path . 'views/templates/front/gid_category.tpl');
-            }
-        } else if (Tools::getValue('controller') == 'orderconfirmation' && (int)Tools::getValue('id_order')) {
+        if (Tools::getValue('controller') == 'orderconfirmation' && (int)Tools::getValue('id_order')) {
             $order = $this->getOrderData((int)Tools::getValue('id_order'));
             if (!empty($google_conversion_id)) {
                 $this->context->smarty->assign(
@@ -650,5 +630,26 @@ class Roihunter extends Module {
         } else {
             return null;
         }
+    }
+
+    private function createRhEasyCategoryDto() {
+
+        $id_category = (int)Tools::getValue('id_category');
+        if ($id_category) {
+            $ref = new ReflectionObject(Context::getContext()->controller);
+
+            if ($ref->hasProperty('cat_products')) {
+                $prop = $ref->getProperty('cat_products');
+                $prop->setAccessible(true);
+                $products = $prop->getValue(Context::getContext()->controller);
+
+                $items = [];
+                foreach ($products as $product) {
+                    array_push($items, new RhEasyProductDto($product['id_product']));
+                }
+                return new RhEasyCategoryDto($id_category, $items);
+            }
+        }
+        return null;
     }
 }
