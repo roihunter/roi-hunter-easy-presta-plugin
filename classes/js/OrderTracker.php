@@ -6,10 +6,8 @@ class OrderTracker {
 
     private static $instance;
 
-    private $roiHunterStorage;
 
     private function __construct() {
-        $this->roiHunterStorage = ROIHunterStorage::getInstance();
     }
 
     public static function getInstance() {
@@ -20,8 +18,36 @@ class OrderTracker {
         return self::$instance;
     }
 
-    public function generateJsScriptOutput() {
+    /**
+     * Generate rh easy placed order js
+     * @param $rhEasyOrderDto RhEasyOrderDto
+     * @return string javascript with placed order
+     */
+    public function generateJsScriptOutput($rhEasyOrderDto) {
 
-        return '';
+        if (isset($rhEasyOrderDto)) { // generate onOrderPlaced with product
+
+            return '<script>
+    if (window.RhEasy) {
+        window.RhEasy.onOrderPlaced = {
+            "add" : function (f) {
+                f(' . $rhEasyOrderDto->toJson() . ');
+                return true;
+            }
+        };
+    }
+</script>';
+
+        } else {                        // generate onOrderPlaced without product
+            return '<script>
+    if (window.RhEasy) {
+        window.RhEasy.onOrderPlaced = {
+            "add" : function (f) {
+                return true;
+            }
+        };
+    }
+</script>';
+        }
     }
 }
