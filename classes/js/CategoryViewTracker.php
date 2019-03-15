@@ -33,7 +33,7 @@ class CategoryViewTracker {
     if (window.RhEasy) {
         window.RhEasy.onCategoryViewed = {
             "add" : function (f) {
-                f({"category" : ' . $rhEasyCategoryDto->toJson() . '}); 
+                f(' . $rhEasyCategoryDto->toJson() . '); 
                 return true;
             }
         };

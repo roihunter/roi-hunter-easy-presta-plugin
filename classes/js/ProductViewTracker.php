@@ -33,7 +33,7 @@ class ProductViewTracker {
     if (window.RhEasy) {
         window.RhEasy.onProductViewed = {
             "add" : function (f) {
-                f({"product" : ' . $rhEasyProductDto->toJson() . '}); 
+                f(' . $rhEasyProductDto->toJson() . ');
                 return true;
             }
         };
