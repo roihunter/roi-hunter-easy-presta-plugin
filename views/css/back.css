@@ -25,3 +25,11 @@
 * Don't forget to prefix your containers with your own identifier
 * to avoid any conflicts with others containers.
 */
+.icon-AdminRoihunter {
+    height: 18px;
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zd…4yIDEwLjk1OSAyMC4yMTQgMTUuNDk1IDMwLjAzOGgtNTMuMjA5eiIvPiAgPC9nPjwvc3ZnPg==);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 18px auto;
+    vertical-align: middle;
+}
