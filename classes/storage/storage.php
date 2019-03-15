@@ -7,8 +7,8 @@ class ROIHunterStorage {
     const RH_GOOGLE_CONVERSION_ID = 'google_conversion_id';
     const RH_GOOGLE_CONVERSION_LABEL = 'google_conversion_label';
     const RH_FB_PIXEL_ID = 'fb_pixel_id';
-    const RH_ACTIVE_BE_PROFILE = 'ROIHUNTER_ACTIVEBEPROFILE';
-    const RH_CLIENT_TOKEN = 'ROIHUNTER_CLIENT_TOKEN';
+    const RH_ACTIVE_BE_PROFILE = 'active_be_profile';
+    const RH_CLIENT_TOKEN = 'client_token';
 
     const STATE_STORAGE_KEYS = [
         self::RH_SYSTEM_USER_ID,
@@ -16,6 +16,9 @@ class ROIHunterStorage {
         self::RH_GOOGLE_CONVERSION_ID,
         self::RH_GOOGLE_CONVERSION_LABEL,
         self::RH_FB_PIXEL_ID];
+
+    const RH_ACTIVE_BE_PROFILE_PRODUCTION = 'production';
+    const RH_ACTIVE_BE_PROFILE_STAGING = 'staging';
 
     private static $instance;
 
@@ -95,6 +98,18 @@ class ROIHunterStorage {
 
     public function setClientToken($value) {
         $this->saveConfigFormValue(self::RH_CLIENT_TOKEN, $value);
+    }
+
+    public function getActiveBeProfile() {
+        return $this->getConfigFormValue(self::RH_ACTIVE_BE_PROFILE);
+    }
+
+    public function setActiveBeProfile($value) {
+        $this->saveConfigFormValue(self::RH_ACTIVE_BE_PROFILE, $value);
+    }
+
+    public function isActiveBeProfileProduction() {
+        return $this->getConfigFormValue(self::RH_ACTIVE_BE_PROFILE) == self::RH_ACTIVE_BE_PROFILE_PRODUCTION;
     }
 
     private function saveConfigFormValue($key, $value) {

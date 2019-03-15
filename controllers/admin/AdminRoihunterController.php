@@ -29,9 +29,9 @@ class AdminRoihunterController extends AdminController {
         $params['storeLanguage'] = pSQL($this->roihunterModule->getStoreLanguage($id_shop));
         $params['storeCountry'] = pSQL($this->roihunterModule->getStoreCountry($id_shop));
         $params['pluginVersion'] = pSQL($this->roihunterModule->getPluginVersion());
-        $params['activeBeProfile'] = pSQL($this->roihunterModule->getActiveBeProfile($id_shop));
-        if ($customer_id = $roiHunterStorage->getSystemUserId()) { // potrebuji id_shop??
-            $params['customerId'] = pSQL($customer_id);   // int ??
+        $params['activeBeProfile'] = pSQL($roiHunterStorage->getActiveBeProfile());
+        if ($customer_id = $roiHunterStorage->getSystemUserId()) {
+            $params['customerId'] = pSQL($customer_id);
         }
         if ($accessToken = $roiHunterStorage->getAccessToken()) {
             $params['accessToken'] = pSQL($accessToken);
