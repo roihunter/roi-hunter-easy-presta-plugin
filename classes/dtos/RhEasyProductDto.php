@@ -18,6 +18,14 @@ class RhEasyProductDto {
         $this->currency = $currency;
     }
 
+    public function getProductId() {
+        return $this->productId;
+    }
+
+    public function getVariantId() {
+        return $this->variantId;
+    }
+
     public function getPrice() {
         return $this->price;
     }

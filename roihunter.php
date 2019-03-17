@@ -116,9 +116,7 @@ class Roihunter extends Module {
             $rhTrackingScriptLoader->setRhEasyCartDto($this->getRhEasyCartDtoFromCookie());
         }
 
-        $output .= $rhTrackingScriptLoader->generateJsScriptOutput();
-
-        return $output;
+        return $rhTrackingScriptLoader->generateJsScriptOutput();
     }
 
     public function hookActionCartSave($params) {
@@ -129,9 +127,7 @@ class Roihunter extends Module {
             $rhEasyCookieDto = $this->rhEasyCookieManager->loadRhEasyCookieDto();
 
             $newRhCartItemDto = $this->createRhEasyCartItemDto();   //get cart item from hook
-            $cartItems = $rhEasyCookieDto->getRhEasyCartDto()->getCartItems();
-            array_push($cartItems, $newRhCartItemDto);
-            $rhEasyCookieDto->getRhEasyCartDto()->setCartItems($cartItems);
+            $rhEasyCookieDto->getRhEasyCartDto()->addItemToCart($newRhCartItemDto);
 
             $this->rhEasyCookieManager->saveRhEasyCookieDto($rhEasyCookieDto);
         }

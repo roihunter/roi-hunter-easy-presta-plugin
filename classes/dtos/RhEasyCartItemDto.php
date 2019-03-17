@@ -31,6 +31,13 @@ class RhEasyCartItemDto {
         return $this->quantity;
     }
 
+    /**
+     * @param int $quantity
+     */
+    public function setQuantity($quantity) {
+        $this->quantity = $quantity;
+    }
+
     public function toJson() {
         return json_encode($this);
     }

@@ -48,14 +48,6 @@ class RhEasyCartDto {
     }
 
     /**
-     * @param array $cartItems
-     */
-    public function setCartItems($cartItems) {
-        $this->cartItems = $cartItems;
-        $this->computeTotalPrice();
-    }
-
-    /**
      * @return float
      */
     public function getTotalPrice() {
@@ -73,5 +65,27 @@ class RhEasyCartDto {
             $this->totalPrice += $cartItem->getProduct()->getPrice() * $cartItem->getQuantity();
             $this->currency = $cartItem->getProduct()->getCurrency();
         }
+    }
+
+    public function addItemToCart(RhEasyCartItemDto $newRhCartItemDto) {
+
+
+        $existingItem = $this->findExistingItem($newRhCartItemDto->getProduct()->getProductId(), $newRhCartItemDto->getProduct()->getVariantId());
+        if ($existingItem != null) {
+            $existingItem->setQuantity($existingItem->getQuantity() + $newRhCartItemDto->getQuantity());
+        } else {
+            array_push($this->cartItems, $newRhCartItemDto);
+        }
+        $this->computeTotalPrice();
+    }
+
+    public function findExistingItem($productId, $variantId) {
+
+        foreach ($this->cartItems as $cartItem) {
+            if ($cartItem->getProduct()->getProductId() == $productId && $cartItem->getProduct()->getVariantId() == $variantId) {
+                return $cartItem;
+            }
+        }
+        return null;
     }
 }
