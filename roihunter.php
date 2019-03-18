@@ -50,7 +50,7 @@ class Roihunter extends Module {
     public function __construct() {
         $this->name = self::ROI_HUNTER_MODULE_NAME;
         $this->tab = 'advertising_marketing';
-        $this->version = '0.9.0';
+        $this->version = '1.0.0';
         $this->author = 'ROI Hunter';
         $this->need_instance = 1;
         $this->bootstrap = true;
@@ -90,7 +90,6 @@ class Roihunter extends Module {
     public function hookDisplayFooter($params) {
 
         $google_conversion_id = $this->roiHunterStorage->getGoogleConversionId();
-        $google_conversion_label = $this->roiHunterStorage->getGoogleConversionLabel();
         $fb_pixel_id = $this->roiHunterStorage->getFbPixelId();
 
         $output = '';
@@ -142,19 +141,14 @@ class Roihunter extends Module {
     }
 
     public function hookBackOfficeHeader() {
-        if (Tools::getValue('module_name') == $this->name) {
-            $this->context->controller->addJS($this->_path . 'views/js/back.js');
-            $this->context->controller->addCSS($this->_path . 'views/css/back.css');
-        }
+
+        $this->context->controller->addJS($this->_path . 'views/js/back.js');
+        $this->context->controller->addCSS($this->_path . 'views/css/back.css');
     }
 
     public function hookHeader() {
         $this->context->controller->addJS($this->_path . '/views/js/front.js');
         $this->context->controller->addCSS($this->_path . '/views/css/front.css');
-        $fb_pixel_id = $this->roiHunterStorage->getFbPixelId();
-        if (!empty($fb_pixel_id)) {
-            $this->context->controller->addJS('https://storage.googleapis.com/goostav-static-files/rheasy-fbq-wrapper.js');
-        }
     }
 
     public function hookDisplayBackOfficeHeader() {
@@ -276,9 +270,6 @@ class Roihunter extends Module {
         $output .= '<tr><td>state endpoint</td><td>' . $base . 'state.php</td></tr>';
         $output .= '<tr><td>check   endpoint</td><td>' . $base . 'check.php</td></tr>';
         $output .= '<tr><td>products endpoint</td><td>' . $base . 'products.php</td></tr>';
-        $output .= '<tr><td>google tracking endpoint</td><td>' . $base . 'google-tracking.php</td></tr>';
-        $output .= '<tr><td>facebook tracking endpoint</td><td>' . $base . 'facebook-tracking.php</td></tr>';
-        $val = "";
         foreach ($this->roiHunterStorage->getStorageWithoutTokens() as $key => $value) {
             $output .= '<tr><td>' . $key . '</td><td>' . $value . '</td></tr>';
         }
