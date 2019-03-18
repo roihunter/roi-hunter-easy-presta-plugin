@@ -29,9 +29,12 @@ if (!defined('_PS_VERSION_')) {
 }
 
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/storage/storage.php');
+require_once(_PS_MODULE_DIR_ . 'roihunter/classes/cookie/RhEasyCookieManager.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/js/RhTrackingScriptLoader.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/dtos/RhEasyProductDto.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/dtos/RhEasyCategoryDto.php');
+require_once(_PS_MODULE_DIR_ . 'roihunter/classes/dtos/RhEasyCartDto.php');
+require_once(_PS_MODULE_DIR_ . 'roihunter/classes/dtos/RhEasyCartItemDto.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/dtos/RhEasyOrderDto.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/dtos/RhEasyPageDto.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/enums/EPageType.php');
@@ -42,6 +45,7 @@ class Roihunter extends Module {
 
     protected $config_form = false;
     private $roiHunterStorage;
+    private $rhEasyCookieManager;
 
     public function __construct() {
         $this->name = self::ROI_HUNTER_MODULE_NAME;
@@ -57,6 +61,7 @@ class Roihunter extends Module {
         $this->confirmUninstall = $this->l('');
         $this->ps_versions_compliancy = ['min' => '1.6', 'max' => _PS_VERSION_];
         $this->roiHunterStorage = ROIHunterStorage::getInstance();
+        $this->rhEasyCookieManager = RhEasyCookieManager::getInstance();
     }
 
     public function install() {
@@ -107,110 +112,25 @@ class Roihunter extends Module {
         if ($pageType == EPageType::ORDER_CONFIRMATION) {
             $rhTrackingScriptLoader->setRhEasyOrderDto($this->createRhEasyOrderDto());
         }
-
-        $output .= $rhTrackingScriptLoader->generateJsScriptOutput();
-
-        // overit ze nekoliduje s nasledujicimi udalostmi
-        $cart_inner = $this->addCartActionDelayed($google_conversion_id, $fb_pixel_id);
-        $cart_inner_google = isset($cart_inner['google']) ? $cart_inner['google'] : '';
-        $cart_fb = isset($cart_inner['fb']) ? $cart_inner['fb'] : '';
-
-        if (Tools::getValue('controller') == 'cart') {
-            if (strlen($cart_inner_google)) {
-                $this->context->smarty->assign(
-                    [
-                        ROIHunterStorage::RH_GOOGLE_CONVERSION_ID => $google_conversion_id,
-                        'inner_cart' => $cart_inner_google,
-                    ]);
-                $output .= $this->context->smarty->fetch($this->local_path . 'views/templates/front/gid_cart_outer.tpl');
-            }
+        if (isset(Context::getContext()->cookie->roihunter)) {  // add to cart event from previous web page
+            $rhTrackingScriptLoader->setRhEasyCartDto($this->getRhEasyCartDtoFromCookie());
         }
 
-        if (strlen($cart_fb)) {
-            $output .= $cart_fb;
-        }
-        return $output;
+        return $rhTrackingScriptLoader->generateJsScriptOutput();
     }
 
     public function hookActionCartSave($params) {
-        if (!(int)Tools::getValue("id_product")) {
-            return;
-        }
 
-        $pridani = [];
-        if (isset(Context::getContext()->cookie->roihunter)) {
-            $pridani = json_decode(Context::getContext()->cookie->roihunter, true);
-        }
-        if (Tools::getValue('add')) {
-            $res = ['id_product' => (int)Tools::getValue("id_product"), 'id_product_attribute' => (int)Tools::getValue("ipa"), 'quantity' => Tools::getValue('qty')];
-            $pridani[] = $res;
-            Context::getContext()->cookie->roihunter = json_encode($pridani);
-        }
-        // todo 'delete'
+        if ((int)Tools::getValue("id_product") && Tools::getValue('add')) {
 
-    }
+            //store new item into storage
+            $rhEasyCookieDto = $this->rhEasyCookieManager->loadRhEasyCookieDto();
 
+            $newRhCartItemDto = $this->createRhEasyCartItemDto();   //get cart item from hook
+            $rhEasyCookieDto->getRhEasyCartDto()->addItemToCart($newRhCartItemDto);
 
-    private function addCartActionDelayed($google_conversion_id, $fb_pixel_id) {
-        if (!isset(Context::getContext()->cookie->roihunter)) {
-            return '';
+            $this->rhEasyCookieManager->saveRhEasyCookieDto($rhEasyCookieDto);
         }
-        $id_shop = Context::getContext()->shop->id;
-        $output = '';
-        $products = json_decode(Context::getContext()->cookie->roihunter, true);
-
-        foreach ($products as &$product) {
-            $id_product_attribute = isset($product['id_product_attribute']) && (int)$product['id_product_attribute'] ? (int)$product['id_product_attribute'] : null;
-            $product['price'] = Product::getPriceStatic($product['id_product'], $this->useTax(), $id_product_attribute);
-        }
-        unset (Context::getContext()->cookie->roihunter);
-
-        $price = 0;
-        $item_ids = '';
-        $added = [];
-        if (!empty($google_conversion_id) || !empty($fb_pixel_id)) {
-            if (is_array($products)) {
-                $carka = '';
-                foreach ($products as $product) {
-                    $id = $product['id_product'];
-                    $price += $product['price'] * $product['quantity'];
-                    if (isset($product['id_product_attribute']) && (int)$product['id_product_attribute']) {
-                        $id .= '-' . $product['id_product_attribute'];
-                    }
-                    if (!isset($added[$id])) {
-                        $item_ids .= "$carka'" . $id . "'";
-                        $carka = ',';
-                    }
-                    $added[$id] = $id;
-                }
-            }
-        }
-        $compute_precision = defined('_PS_PRICE_COMPUTE_PRECISION_') ? _PS_PRICE_COMPUTE_PRECISION_ : 2;
-        $price = Tools::ps_round($price, $compute_precision);
-        if (!empty($google_conversion_id)) {
-            $this->context->smarty->assign(
-                [
-                    ROIHunterStorage::RH_GOOGLE_CONVERSION_ID => $google_conversion_id,
-                    'gid_cart_products' => $item_ids,
-                    'gid_price' => $price,
-                ]);
-            $output['google'] = $this->context->smarty->fetch($this->local_path . 'views/templates/front/gid_cart_inner.tpl');
-        }
-
-        if (!empty($fb_pixel_id)) {
-            $id_currency = Context::getContext()->cart->id_currency;
-            $currency = new Currency($id_currency);
-
-            $this->context->smarty->assign(
-                [
-                    ROIHunterStorage::RH_FB_PIXEL_ID => $fb_pixel_id,
-                    'currency' => $currency->iso_code,
-                    'fid_product' => $item_ids,
-                    'fb_price' => $price,
-                ]);
-            $output['fb'] = $this->context->smarty->fetch($this->local_path . 'views/templates/front/fb_cart.tpl');
-        }
-        return $output;
     }
 
     private function roundPrice($price, $currency = null) {
@@ -611,5 +531,31 @@ class Roihunter extends Module {
 
         }
         return null;
+    }
+
+    private function createRhEasyCartItemDto() {
+
+        $productId = (int)Tools::getValue("id_product");
+        $variantId = (int)Tools::getValue("ipa");
+        $quantity = (int)Tools::getValue('qty');
+        $price = Product::getPriceStatic($productId, $this->useTax(), $variantId);
+
+        $compute_precision = defined('_PS_PRICE_COMPUTE_PRECISION_') ? _PS_PRICE_COMPUTE_PRECISION_ : 2;
+        $roundedPrice = Tools::ps_round($price, $compute_precision);
+
+        $id_currency = Context::getContext()->cart->id_currency;
+        $currency = new Currency($id_currency);
+
+        return new RhEasyCartItemDto(
+            new RhEasyProductDto($productId, $variantId, null, $roundedPrice, $currency->iso_code),
+            $quantity);
+    }
+
+    private function getRhEasyCartDtoFromCookie() {
+
+        $rhEasyCookieDto = $this->rhEasyCookieManager->loadRhEasyCookieDto();
+        $this->rhEasyCookieManager->clearStorage();
+
+        return $rhEasyCookieDto->getRhEasyCartDto();
     }
 }

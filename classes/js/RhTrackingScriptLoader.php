@@ -23,6 +23,7 @@ class RhTrackingScriptLoader {
     private $rhEasyProductDto;
     private $rhEasyCategoryDto;
     private $rhEasyOrderDto;
+    private $rhEasyCartDto;
 
     private function __construct() {
         $this->roiHunterStorage = ROIHunterStorage::getInstance();
@@ -47,7 +48,7 @@ class RhTrackingScriptLoader {
         $resultJs .= $this->pageTypeTracker->generateJsScriptOutput($this->rhEasyPageDto);
         $resultJs .= $this->productViewTracker->generateJsScriptOutput($this->rhEasyProductDto);
         $resultJs .= $this->categoryViewTracker->generateJsScriptOutput($this->rhEasyCategoryDto);
-        $resultJs .= $this->addToCartTracker->generateJsScriptOutput();
+        $resultJs .= $this->addToCartTracker->generateJsScriptOutput($this->rhEasyCartDto);
         $resultJs .= $this->orderTracker->generateJsScriptOutput($this->rhEasyOrderDto);
         $resultJs .= $this->generateRhEasyEventsTrackingJs();
         return $resultJs;
@@ -89,6 +90,10 @@ class RhTrackingScriptLoader {
 
     public function setRhEasyCategoryDto($rhEasyCategoryDto) {
         $this->rhEasyCategoryDto = $rhEasyCategoryDto;
+    }
+
+    public function setRhEasyCartDto($rhEasyCartDto) {
+        $this->rhEasyCartDto = $rhEasyCartDto;
     }
 
     public function setRhEasyOrderDto($rhEasyOrderDto) {
