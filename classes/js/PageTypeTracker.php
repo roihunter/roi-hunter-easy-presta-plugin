@@ -31,7 +31,7 @@ class PageTypeTracker {
     if (window.RhEasy) {
         window.RhEasy.onPageLoaded = { 
             "add" : function (f) { 
-                f({"' . $rhEasyPageDto->toJson() . '"});
+                f(' . $rhEasyPageDto->toJson() . ');
                 return true;
             }
         };

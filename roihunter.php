@@ -32,6 +32,7 @@ require_once(_PS_MODULE_DIR_ . 'roihunter/classes/storage/storage.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/js/RhTrackingScriptLoader.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/dtos/RhEasyProductDto.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/dtos/RhEasyCategoryDto.php');
+require_once(_PS_MODULE_DIR_ . 'roihunter/classes/dtos/RhEasyOrderDto.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/dtos/RhEasyPageDto.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/enums/EPageType.php');
 
@@ -103,6 +104,9 @@ class Roihunter extends Module {
         if ($pageType == EPageType::CATEGORY) {
             $rhTrackingScriptLoader->setRhEasyCategoryDto($this->createRhEasyCategoryDto());
         }
+        if ($pageType == EPageType::ORDER_CONFIRMATION) {
+            $rhTrackingScriptLoader->setRhEasyOrderDto($this->createRhEasyOrderDto());
+        }
 
         $output .= $rhTrackingScriptLoader->generateJsScriptOutput();
 
@@ -111,34 +115,7 @@ class Roihunter extends Module {
         $cart_inner_google = isset($cart_inner['google']) ? $cart_inner['google'] : '';
         $cart_fb = isset($cart_inner['fb']) ? $cart_inner['fb'] : '';
 
-        if (Tools::getValue('controller') == 'orderconfirmation' && (int)Tools::getValue('id_order')) {
-            $order = $this->getOrderData((int)Tools::getValue('id_order'));
-            if (!empty($google_conversion_id)) {
-                $this->context->smarty->assign(
-                    [
-                        ROIHunterStorage::RH_GOOGLE_CONVERSION_ID => $google_conversion_id,
-                        ROIHunterStorage::RH_GOOGLE_CONVERSION_LABEL => $google_conversion_label,
-                        'id_order' => $order['id_order'],
-                        'currency' => $order['currency'],
-                        'gid_products' => $order['item_ids'],
-                        'gid_totalvalue' => $order['total_value'],
-                    ]);
-                $output .= $this->context->smarty->fetch($this->local_path . 'views/templates/front/gid_order.tpl');
-            }
-
-            if (!empty($fb_pixel_id)) {
-                $iso = Context::getContext()->currency->iso_code;
-
-                $this->context->smarty->assign(
-                    [
-                        ROIHunterStorage::RH_FB_PIXEL_ID => $fb_pixel_id,
-                        'currency' => $order['currency'],
-                        'fid_product' => $order['item_ids'],
-                        'fb_price' => $order['total_value'],
-                    ]);
-                $output .= $this->context->smarty->fetch($this->local_path . 'views/templates/front/fb_order.tpl');
-            }
-        } else {
+        if (Tools::getValue('controller') == 'cart') {
             if (strlen($cart_inner_google)) {
                 $this->context->smarty->assign(
                     [
@@ -234,39 +211,6 @@ class Roihunter extends Module {
             $output['fb'] = $this->context->smarty->fetch($this->local_path . 'views/templates/front/fb_cart.tpl');
         }
         return $output;
-    }
-
-    private function getOrderData($id_order) {
-        $order = new Order($id_order);
-        $currency = new Currency($order->id_currency);
-        $transactionProducts = [];
-        $products = $order->getProducts();
-
-        $carka = '';
-        $item_ids = '';
-        foreach ($products as $p) {
-            $id_product = (int)$p['product_id'];
-            if ((int)(int)$p['product_attribute_id']) {
-                $id_product .= '-' . (int)$p['product_attribute_id'];
-            }
-            $item_ids .= "$carka'" . $id_product . "'";
-            $carka = ',';
-        }
-        if ($this->useTax()) {
-            $total_price = $order->total_products_wt; // $order->total_paid_tax_incl;
-        } else {
-            $total_price = $order->total_products;   // $order->total_paid_tax_excl;
-        }
-
-
-        $retval =
-            [
-                'id_order' => $id_order,
-                'currency' => $currency->iso_code,
-                'item_ids' => $item_ids,
-                'total_value' => $this->roundPrice($total_price),
-            ];
-        return $retval;
     }
 
     private function roundPrice($price, $currency = null) {
@@ -627,7 +571,7 @@ class Roihunter extends Module {
 
             $currency = Context::getContext()->currency->iso_code;
 
-            return new RhEasyProductDto($id_product, $name, $this->roundPrice($price), $currency);
+            return new RhEasyProductDto($id_product, null, $name, $this->roundPrice($price), $currency);
         } else {
             return null;
         }
@@ -644,12 +588,27 @@ class Roihunter extends Module {
                 $prop->setAccessible(true);
                 $products = $prop->getValue(Context::getContext()->controller);
 
-                $items = [];
-                foreach ($products as $product) {
-                    array_push($items, new RhEasyProductDto($product['id_product']));
-                }
-                return new RhEasyCategoryDto($id_category, $items);
+                return RhEasyCategoryDto::fromPrestaShopCategoryProducts($id_category, $products);
             }
+        }
+        return null;
+    }
+
+    private function createRhEasyOrderDto() {
+
+        $orderId = (int)Tools::getValue('id_order');
+        if ($orderId) {
+            $order = new Order($orderId);
+            $currency = new Currency($order->id_currency);
+
+            if ($this->useTax()) {
+                $total_price = $order->total_products_wt; // $order->total_paid_tax_incl;
+            } else {
+                $total_price = $order->total_products;   // $order->total_paid_tax_excl;
+            }
+
+            return RhEasyOrderDto::fromPrestaShopOrderProducts($orderId, $currency->iso_code, $order->getProducts(), $this->roundPrice($total_price));
+
         }
         return null;
     }
