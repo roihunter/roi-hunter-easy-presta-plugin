@@ -537,7 +537,7 @@ class Roihunter extends Module {
 
         $productId = (int)Tools::getValue("id_product");
         $variantId = (int)Tools::getValue("ipa");
-        $quantity = Tools::getValue('qty');
+        $quantity = (int)Tools::getValue('qty');
         $price = Product::getPriceStatic($productId, $this->useTax(), $variantId);
 
         $compute_precision = defined('_PS_PRICE_COMPUTE_PRECISION_') ? _PS_PRICE_COMPUTE_PRECISION_ : 2;

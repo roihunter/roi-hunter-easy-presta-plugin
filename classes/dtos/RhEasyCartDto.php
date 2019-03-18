@@ -60,10 +60,13 @@ class RhEasyCartDto {
 
     private function computeTotalPrice() {
 
+        if (!empty($this->cartItems)) {
+            $this->currency = $this->cartItems[0]->getProduct()->getCurrency();
+        }
+
         $this->totalPrice = 0;
-        foreach ($this->getCartItems() as $cartItem) {  //RhEasyCartItemDto
+        foreach ($this->cartItems as $cartItem) {  //RhEasyCartItemDto
             $this->totalPrice += $cartItem->getProduct()->getPrice() * $cartItem->getQuantity();
-            $this->currency = $cartItem->getProduct()->getCurrency();
         }
     }
 
