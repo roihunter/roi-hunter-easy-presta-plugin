@@ -50,7 +50,7 @@ class Roihunter extends Module {
     public function __construct() {
         $this->name = self::ROI_HUNTER_MODULE_NAME;
         $this->tab = 'advertising_marketing';
-        $this->version = '0.9.0';
+        $this->version = '1.0.0';
         $this->author = 'ROI Hunter';
         $this->need_instance = 1;
         $this->bootstrap = true;
