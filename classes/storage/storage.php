@@ -72,24 +72,12 @@ class ROIHunterStorage {
         return $this->getConfigFormValue(self::RH_GOOGLE_CONVERSION_ID);
     }
 
-    public function setGoogleConversionId($value) {
-        $this->saveConfigFormValue(self::RH_GOOGLE_CONVERSION_ID, $value);
-    }
-
     public function getGoogleConversionLabel() {
         return $this->getConfigFormValue(self::RH_GOOGLE_CONVERSION_LABEL);
     }
 
-    public function setGoogleConversionLabel($value) {
-        $this->saveConfigFormValue(self::RH_GOOGLE_CONVERSION_LABEL, $value);
-    }
-
     public function getFbPixelId() {
         return $this->getConfigFormValue(self::RH_FB_PIXEL_ID);
-    }
-
-    public function setFbPixelId($value) {
-        $this->saveConfigFormValue(self::RH_FB_PIXEL_ID, $value);
     }
 
     public function getClientToken() {
