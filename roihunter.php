@@ -536,7 +536,10 @@ class Roihunter extends Module {
     private function createRhEasyCartItemDto() {
 
         $productId = (int)Tools::getValue("id_product");
-        $variantId = (int)Tools::getValue("ipa");
+        $variantId = null;
+        if (Tools::getValue("ipa")) {
+            $variantId = (int)Tools::getValue("ipa");
+        }
         $quantity = (int)Tools::getValue('qty');
         $price = Product::getPriceStatic($productId, $this->useTax(), $variantId);
 
