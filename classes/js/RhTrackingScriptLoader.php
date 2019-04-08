@@ -72,9 +72,9 @@ class RhTrackingScriptLoader {
     private function generateRhEasyEventsTrackingJs() {
 
         if ($this->roiHunterStorage->isActiveBeProfileProduction()) {
-            return '<script src="https://storage.googleapis.com/goostav-static-files/rh-easy-events-tracking.umd.js" async></script>';
+            return '<script src="https://storage.googleapis.com/goostav-static-files-master/presta-tracking.js" async></script>';
         } else {
-            return '<script src="https://storage.googleapis.com/goostav-static-files/rh-easy-events-tracking-staging.umd.js" async></script>';
+            return '<script src="https://storage.googleapis.com/goostav-static-files-staging/presta-tracking.js" async></script>';
         }
     }
 
