@@ -37,6 +37,7 @@ require_once(_PS_MODULE_DIR_ . 'roihunter/classes/dtos/RhEasyCartDto.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/dtos/RhEasyCartItemDto.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/dtos/RhEasyOrderDto.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/dtos/RhEasyPageDto.php');
+require_once(_PS_MODULE_DIR_ . 'roihunter/classes/requests/ROIHunterRequestsManager.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/enums/EPageType.php');
 
 class Roihunter extends Module {
@@ -46,6 +47,7 @@ class Roihunter extends Module {
     protected $config_form = false;
     private $roiHunterStorage;
     private $rhEasyCookieManager;
+    private $rhRequestsManager;
 
     public function __construct() {
         $this->name = self::ROI_HUNTER_MODULE_NAME;
@@ -62,6 +64,7 @@ class Roihunter extends Module {
         $this->ps_versions_compliancy = ['min' => '1.6', 'max' => _PS_VERSION_];
         $this->roiHunterStorage = ROIHunterStorage::getInstance();
         $this->rhEasyCookieManager = RhEasyCookieManager::getInstance();
+        $this->rhRequestsManager = ROIHunterRequestsManager::getInstance();
     }
 
     public function install() {
@@ -82,6 +85,7 @@ class Roihunter extends Module {
         $this->roiHunterStorage->setClientToken(null);
         $this->uninstallModuleTab('AdminRoihunter');
         $this->roiHunterStorage->clearStorage();
+        $this->rhRequestsManager->onAppUninstall();
         return parent::uninstall();
     }
 
