@@ -100,6 +100,10 @@ class ROIHunterStorage {
         return $this->getConfigFormValue(self::RH_ACTIVE_BE_PROFILE) == self::RH_ACTIVE_BE_PROFILE_PRODUCTION;
     }
 
+    public function isActiveBeProfileStaging() {
+        return $this->getConfigFormValue(self::RH_ACTIVE_BE_PROFILE) == self::RH_ACTIVE_BE_PROFILE_STAGING;
+    }
+
     private function saveConfigFormValue($key, $value) {
         $key = $this->translateKey($key);
         Configuration::updateValue($key, $value, false, Shop::getGroupFromShop($this->shopId), $this->shopId);
