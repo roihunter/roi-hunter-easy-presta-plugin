@@ -37,7 +37,7 @@ class ROIHunterRequestsManager {
     private function send($path) {
         if ($this->baseUrl == null) {
             error_log('Cannot send the request ' . $path . ' because base URL was not specified');
-            return null;
+            return ;
         }
 
         $curl = curl_init();
@@ -47,10 +47,9 @@ class ROIHunterRequestsManager {
             CURLOPT_HTTPHEADER => ['X-Authorization: ' . $this->accessToken]
         ]);
 
-        $resp = curl_exec($curl);
+        curl_exec($curl);
 
         curl_close($curl);
-        return $resp;
     }
 }
 
