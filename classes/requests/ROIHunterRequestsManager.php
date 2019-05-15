@@ -27,7 +27,11 @@ class ROIHunterRequestsManager {
     }
 
     public function onAppUninstall() {
-        $this->send('/uninstall');
+        try {
+            $this->send('/uninstall');
+        } catch (Exception $e) {
+            error_log("Some error while sending request was occurred: " . $e->getMessage());
+        }
     }
 
     private function send($path) {
