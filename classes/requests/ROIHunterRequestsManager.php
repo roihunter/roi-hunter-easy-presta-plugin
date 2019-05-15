@@ -5,6 +5,9 @@ require_once(_PS_MODULE_DIR_ . 'roihunter/classes/storage/storage.php');
 
 class ROIHunterRequestsManager {
 
+    const GOOSTAV_API_PRODUCTION = 'https://goostav.roihunter.com';
+    const GOOSTAV_API_STAGING = 'https://goostav-staging.roihunter.com';
+
     private static $instance;
 
     public static function getInstance() {
@@ -20,9 +23,9 @@ class ROIHunterRequestsManager {
     private function __construct() {
         $this->accessToken = ROIHunterStorage::getInstance()->getAccessToken();
         if (ROIHunterStorage::getInstance()->isActiveBeProfileProduction()) {
-            $this->baseUrl = 'https://goostav.roihunter.com';
+            $this->baseUrl = self::GOOSTAV_API_PRODUCTION;
         } else if (ROIHunterStorage::getInstance()->isActiveBeProfileStaging()) {
-            $this->baseUrl = 'https://goostav-staging.roihunter.com';
+            $this->baseUrl = self::GOOSTAV_API_STAGING;
         }
     }
 
