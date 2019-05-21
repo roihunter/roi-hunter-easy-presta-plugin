@@ -485,8 +485,9 @@ class Roihunter extends Module {
             $price = Product::getPriceStatic($id_product, $this->useTax());
 
             $currency = Context::getContext()->currency->iso_code;
+            $firstVariantId = (int) Db::getInstance()->getValue('select id_product_attribute from '._DB_PREFIX_.'product_attribute where id_product = '.$id_product);
 
-            return new RhEasyProductDto($id_product, null, $name, $this->roundPrice($price), $currency);
+            return new RhEasyProductDto($id_product, $firstVariantId, $name, $this->roundPrice($price), $currency);
         } else {
             return null;
         }
