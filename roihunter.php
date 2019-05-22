@@ -357,7 +357,7 @@ class Roihunter extends Module {
     }
 
     private function installModuleTab($tabClass, $tabName, $idTabParent) {
-        $sql = 'SELECT id_tab FROM ' . _DB_PREFIX_ . ' tab WHERE classname ="' . pSQL($tabClass) . '"';
+        $sql = 'SELECT id_tab FROM ' . _DB_PREFIX_ . 'tab WHERE class_name ="' . pSQL($tabClass) . '"';
         $id_tab = Db::getInstance()->getValue($sql);
         if ((int)$id_tab) {
             $tab = new Tab($id_tab);
