@@ -546,7 +546,7 @@ class Roihunter extends Module {
         $currency = new Currency($id_currency);
 
         return new RhEasyCartItemDto(
-            new RhEasyProductDto($productId, $variantId, null, $roundedPrice, $currency->iso_code),
+            new RhEasyProductDto($productId, $variantId, Product::getProductName($productId), $roundedPrice, $currency->iso_code),
             $quantity);
     }
 
