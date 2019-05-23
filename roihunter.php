@@ -172,7 +172,12 @@ class Roihunter extends Module {
     }
 
     public function getStoreUrl($id_shop) {
-        return Configuration::get('PS_SSL_ENABLED') ? 'https://' . ShopUrl::getMainShopDomainSSL($id_shop) : 'http://' . ShopUrl::getMainShopDomain($id_shop);
+        $shopUrl = new ShopUrl($id_shop);
+        if (Configuration::get('PS_SSL_ENABLED')) {
+            return 'https://'.$shopUrl->domain_ssl.$shopUrl->physical_uri;
+        } else {
+            return 'http://'.$shopUrl->domain.$shopUrl->physical_uri;
+        }
     }
 
     public function getPreviewUrl($id_shop) {
