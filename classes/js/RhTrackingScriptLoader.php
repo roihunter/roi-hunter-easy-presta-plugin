@@ -73,8 +73,10 @@ class RhTrackingScriptLoader {
 
         if ($this->roiHunterStorage->isActiveBeProfileProduction()) {
             return '<script src="https://storage.googleapis.com/goostav-static-files-master/presta-tracking.js" async></script>';
-        } else {
+        } else if ($this->roiHunterStorage->isActiveBeProfileStaging()) {
             return '<script src="https://storage.googleapis.com/goostav-static-files-staging/presta-tracking.js" async></script>';
+        } else {
+            return '<script>console.error("Cannot load RH Easy events tracking scripts because application profile is not staging or production")</script>';
         }
     }
 

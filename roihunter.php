@@ -226,8 +226,10 @@ class Roihunter extends Module {
     public function getIframeUrl() {
         if ($this->roiHunterStorage->isActiveBeProfileProduction()) {
             return 'https://magento.roihunter.com';
-        } else {
+        } else if ($this->roiHunterStorage->isActiveBeProfileStaging()) {
             return 'https://goostav-fe-staging.roihunter.com';
+        } else {
+            throw new PrestaShopException("Cannot get iframe URL because active profile is not staging or production");
         }
     }
 
