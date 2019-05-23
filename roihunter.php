@@ -226,8 +226,10 @@ class Roihunter extends Module {
     public function getIframeUrl() {
         if ($this->roiHunterStorage->isActiveBeProfileProduction()) {
             return 'https://magento.roihunter.com';
-        } else {
+        } else if ($this->roiHunterStorage->isActiveBeProfileStaging()) {
             return 'https://goostav-fe-staging.roihunter.com';
+        } else {
+            throw new PrestaShopException("Cannot get iframe URL because active profile is not staging or production");
         }
     }
 
@@ -257,13 +259,6 @@ class Roihunter extends Module {
             return '<div class="panel"><h3>' . $this->l('Multishop detected. Please switch to a specific shop!') . '</h3></div>';
         }
 
-        /**
-         * If values have been submitted in the form, process.
-         */
-        if (((bool)Tools::isSubmit('submitRoihunterModule')) == true) {
-            $this->saveFormInConfiguration();
-        }
-
         $this->context->smarty->assign('module_dir', $this->_path);
 
         $output = $this->context->smarty->fetch($this->local_path . 'views/templates/admin/configure.tpl');
@@ -274,86 +269,14 @@ class Roihunter extends Module {
         $output .= '<tr><td>state endpoint</td><td>' . $base . 'state.php</td></tr>';
         $output .= '<tr><td>check   endpoint</td><td>' . $base . 'check.php</td></tr>';
         $output .= '<tr><td>products endpoint</td><td>' . $base . 'products.php</td></tr>';
+        $output .= '<tr><td>active profile</td><td>' . $this->roiHunterStorage->getActiveBeProfile() . '</td></tr>';
         foreach ($this->roiHunterStorage->getStorageWithoutTokens() as $key => $value) {
             $output .= '<tr><td>' . $key . '</td><td>' . $value . '</td></tr>';
         }
         $output .= '</table>';
 
 
-        return $output . $this->renderForm();
-    }
-
-    /**
-     * Create the form that will be displayed in the configuration of your module.
-     */
-    protected function renderForm() {
-        $helper = new HelperForm();
-
-        $helper->show_toolbar = false;
-        $helper->table = $this->table;
-        $helper->module = $this;
-        $helper->default_form_language = $this->context->language->id;
-        $helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG', 0);
-
-        $helper->identifier = $this->identifier;
-        $helper->submit_action = 'submitRoihunterModule';
-        $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false)
-            . '&configure=' . $this->name . '&tab_module=' . $this->tab . '&module_name=' . $this->name;
-        $helper->token = Tools::getAdminTokenLite('AdminModules');
-
-        $helper->tpl_vars = [
-            'fields_value' => [ROIHunterStorage::RH_ACTIVE_BE_PROFILE => $this->roiHunterStorage->isActiveBeProfileProduction()], // form values in configuration
-            'languages' => $this->context->controller->getLanguages(),
-            'id_language' => $this->context->language->id,
-        ];
-
-        return $helper->generateForm([$this->getConfigForm()]);
-    }
-
-    /**
-     * Create the structure of your form.
-     */
-    protected function getConfigForm() {
-        return [
-            'form' => [
-                'legend' => [
-                    'title' => $this->l('Settings'),
-                    'icon' => 'icon-cogs',
-                ],
-                'input' => [
-                    [
-                        'type' => 'switch',
-                        'label' => $this->l('Active application profile'),
-                        'name' => ROIHunterStorage::RH_ACTIVE_BE_PROFILE,
-                        'is_bool' => true,
-                        'desc' => $this->l(''),
-                        'values' => [
-                            [
-                                'id' => 'active_on',
-                                'value' => true,
-                                'label' => $this->l('Production'),
-                            ],
-                            [
-                                'id' => 'active_off',
-                                'value' => false,
-                                'label' => $this->l('Stagging'),
-                            ],
-                        ],
-                    ],
-                ],
-                'submit' => [
-                    'title' => $this->l('Save'),
-                ],
-            ],
-        ];
-    }
-
-    protected function saveFormInConfiguration() {
-        if ((int)Tools::getValue(ROIHunterStorage::RH_ACTIVE_BE_PROFILE)) {
-            $this->roiHunterStorage->setActiveBeProfile(ROIHunterStorage::RH_ACTIVE_BE_PROFILE_PRODUCTION);
-        } else {
-            $this->roiHunterStorage->setActiveBeProfile(ROIHunterStorage::RH_ACTIVE_BE_PROFILE_STAGING);
-        }
+        return $output;
     }
 
     private function installModuleTab($tabClass, $tabName, $idTabParent) {

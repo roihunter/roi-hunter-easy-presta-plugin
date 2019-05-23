@@ -7,7 +7,6 @@ class ROIHunterStorage {
     const RH_GOOGLE_CONVERSION_ID = 'google_conversion_id';
     const RH_GOOGLE_CONVERSION_LABEL = 'google_conversion_label';
     const RH_FB_PIXEL_ID = 'fb_pixel_id';
-    const RH_ACTIVE_BE_PROFILE = 'active_be_profile';
     const RH_CLIENT_TOKEN = 'client_token';
 
     const STATE_STORAGE_KEYS = [
@@ -17,8 +16,11 @@ class ROIHunterStorage {
         self::RH_GOOGLE_CONVERSION_LABEL,
         self::RH_FB_PIXEL_ID];
 
-    const RH_ACTIVE_BE_PROFILE_PRODUCTION = 'production';
-    const RH_ACTIVE_BE_PROFILE_STAGING = 'staging';
+    const BE_PROFILE_PRODUCTION_NAME = 'production';
+    const BE_PROFILE_STAGING_NAME = 'staging';
+
+    /* change to BE_PROFILE_STAGING_NAME if you want app running in staging mode */
+    const RH_ACTIVE_BE_PROFILE = self::BE_PROFILE_PRODUCTION_NAME;
 
     private static $instance;
 
@@ -89,19 +91,15 @@ class ROIHunterStorage {
     }
 
     public function getActiveBeProfile() {
-        return $this->getConfigFormValue(self::RH_ACTIVE_BE_PROFILE);
-    }
-
-    public function setActiveBeProfile($value) {
-        $this->saveConfigFormValue(self::RH_ACTIVE_BE_PROFILE, $value);
+        return self::RH_ACTIVE_BE_PROFILE;
     }
 
     public function isActiveBeProfileProduction() {
-        return $this->getConfigFormValue(self::RH_ACTIVE_BE_PROFILE) == self::RH_ACTIVE_BE_PROFILE_PRODUCTION;
+        return self::RH_ACTIVE_BE_PROFILE == self::BE_PROFILE_PRODUCTION_NAME;
     }
 
     public function isActiveBeProfileStaging() {
-        return $this->getConfigFormValue(self::RH_ACTIVE_BE_PROFILE) == self::RH_ACTIVE_BE_PROFILE_STAGING;
+        return self::RH_ACTIVE_BE_PROFILE == self::BE_PROFILE_STAGING_NAME;
     }
 
     private function saveConfigFormValue($key, $value) {
