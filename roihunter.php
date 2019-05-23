@@ -192,9 +192,7 @@ class Roihunter extends Module {
      * ... s paramatrem id_shop
      */
     public function getRhStateApiBaseUrl($id_shop) {
-        $base = $this->getStoreUrl($id_shop);
-        // $protocol = Configuration::get('PS_SSL_ENABLED')?'https://':'http://';
-        return $base . __PS_BASE_URI__ . 'modules/roihunter/';
+        return $this->getStoreUrl($id_shop) . 'modules/roihunter/';
     }
 
     public function getStoreName($id_shop) {
