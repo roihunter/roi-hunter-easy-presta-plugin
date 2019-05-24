@@ -43,6 +43,8 @@ require_once(_PS_MODULE_DIR_ . 'roihunter/enums/EPageType.php');
 class Roihunter extends Module {
 
     const ROI_HUNTER_MODULE_NAME = 'roihunter';
+    const ROI_HUNTER_TAB_CLASS_NAME = 'AdminRoihunter';
+    const ROI_HUNTER_TAB_NAME = 'ROI Hunter Easy';
 
     protected $config_form = false;
     private $roiHunterStorage;
@@ -75,7 +77,7 @@ class Roihunter extends Module {
             $this->registerHook('actionCartSave') &&
             $this->registerHook('displayBackOfficeHeader');
         if ($retval) {
-            $this->installModuleTab('AdminRoihunter', 'ROI Hunter Easy', 0);
+            $this->installModuleTab();
             $this->roiHunterStorage->setClientToken($this->getSecureToken());
         }
         return $retval;
@@ -83,7 +85,7 @@ class Roihunter extends Module {
 
     public function uninstall() {
         $this->roiHunterStorage->setClientToken(null);
-        $this->uninstallModuleTab('AdminRoihunter');
+        $this->uninstallModuleTab();
         $this->roiHunterStorage->clearStorage();
         $this->rhRequestsManager->onAppUninstall();
         return parent::uninstall();
@@ -279,8 +281,27 @@ class Roihunter extends Module {
         return $output;
     }
 
-    private function installModuleTab($tabClass, $tabName, $idTabParent) {
-        $sql = 'SELECT id_tab FROM ' . _DB_PREFIX_ . 'tab WHERE class_name ="' . pSQL($tabClass) . '"';
+    private function installModuleTab() {
+        if (Tools::version_compare(_PS_VERSION_, '1.7', '<')) {
+            $this->v16InstallModuleTab();
+        } else {
+            $this->v17InstallModuleTab();
+        }
+    }
+
+    private function v17InstallModuleTab() {
+        $this->tabs = array(
+            array(
+                'name' => self::ROI_HUNTER_TAB_NAME,
+                'class_name' => self::ROI_HUNTER_TAB_CLASS_NAME,
+                'visible' => true,
+                'parent_class_name' => 'DEFAULT_MTR'
+            )
+        );
+    }
+
+    private function v16InstallModuleTab() {
+        $sql = 'SELECT id_tab FROM ' . _DB_PREFIX_ . 'tab WHERE class_name ="' . pSQL(self::ROI_HUNTER_TAB_CLASS_NAME) . '"';
         $id_tab = Db::getInstance()->getValue($sql);
         if ((int)$id_tab) {
             $tab = new Tab($id_tab);
@@ -288,16 +309,16 @@ class Roihunter extends Module {
             $tab = new Tab();
         }
 
-        @copy(_PS_MODULE_DIR_ . $this->module->name . '/logo.gif', _PS_IMG_DIR_ . 't/' . $tabClass . '.gif');
+        @copy(_PS_MODULE_DIR_ . $this->module->name . '/logo.gif', _PS_IMG_DIR_ . 't/' . self::ROI_HUNTER_TAB_CLASS_NAME . '.gif');
 
         $tabNames = [];
         foreach (Language::getLanguages(false) as $language) {
-            $tabNames[$language['id_lang']] = $tabName;
+            $tabNames[$language['id_lang']] = self::ROI_HUNTER_TAB_NAME;
         }
         $tab->name = $tabNames;
-        $tab->class_name = $tabClass;
+        $tab->class_name = self::ROI_HUNTER_TAB_CLASS_NAME;
         $tab->module = $this->name;
-        $tab->id_parent = $idTabParent;
+        $tab->id_parent = 0;
         if (!$tab->save()) {
             $this->messages[] = 'Failed save Tab ' . implode(',', $tabNames);
             return false;
@@ -311,8 +332,8 @@ class Roihunter extends Module {
         return true;
     }
 
-    public function uninstallModuleTab($tabClass) {
-        $idTab = Tab::getIdFromClassName($tabClass);
+    public function uninstallModuleTab() {
+        $idTab = Tab::getIdFromClassName(self::ROI_HUNTER_TAB_CLASS_NAME);
         if ($idTab != 0) {
             $tab = new Tab($idTab);
             $tab->delete();
