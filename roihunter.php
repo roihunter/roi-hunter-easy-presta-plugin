@@ -298,7 +298,7 @@ class Roihunter extends Module {
                 'name' => self::ROI_HUNTER_TAB_NAME,
                 'class_name' => self::ROI_HUNTER_TAB_CLASS_NAME,
                 'visible' => true,
-                'parent_class_name' => 'DEFAULT_MTR'
+                'parent_class_name' => 'IMPROVE'
             )
         );
     }
