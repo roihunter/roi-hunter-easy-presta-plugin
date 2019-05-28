@@ -30,10 +30,10 @@ if (!defined('_PS_VERSION_')) {
 
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/storage/storage.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/cookie/RhEasyCookieManager.php');
-require_once(_PS_MODULE_DIR_ . 'roihunter/classes/js/RhTrackingScriptLoader.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/dtos/RhEasyProductDto.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/dtos/RhEasyCategoryDto.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/dtos/RhEasyCartDto.php');
+require_once(_PS_MODULE_DIR_ . 'roihunter/classes/dtos/RhEasyDto.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/dtos/RhEasyCartItemDto.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/dtos/RhEasyOrderDto.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/dtos/RhEasyPageDto.php');
