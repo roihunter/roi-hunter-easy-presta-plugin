@@ -93,35 +93,44 @@ class Roihunter extends Module {
 
     /************************** hooks start ******************************/
 
-    public function hookDisplayFooter($params) {
+    public function hookDisplayFooter() {
 
-        $google_conversion_id = $this->roiHunterStorage->getGoogleConversionId();
-        $fb_pixel_id = $this->roiHunterStorage->getFbPixelId();
-
-        $output = '';
-        if (empty($google_conversion_id) && empty($fb_pixel_id)) {
-            return $output;
+        if (!$this->roiHunterStorage->trackingParamsAreInitialized()) {
+            return '';
         }
 
-        $rhTrackingScriptLoader = RhTrackingScriptLoader::getInstance();
+        $smarty = new Smarty();
 
         $pageType = EPageType::fromPrestaShopController(Tools::getValue('controller'));
-        $rhTrackingScriptLoader->setRhEasyPageDto(new RhEasyPageDto($pageType));
+        $smarty->assign('rhEasyDto', new RhEasyDto(
+            "PRESTA_SHOP",
+            $this->roiHunterStorage->getGoogleConversionId(),
+            $this->roiHunterStorage->getGoogleConversionLabel(),
+            $this->roiHunterStorage->getFbPixelId())
+        );
+
+        $smarty->assign('rhEasyPageDto', new RhEasyPageDto($pageType));
 
         if ($pageType == EPageType::PRODUCT) {
-            $rhTrackingScriptLoader->setRhEasyProductDto($this->createRhEasyProductDto());
-        }
-        if ($pageType == EPageType::CATEGORY) {
-            $rhTrackingScriptLoader->setRhEasyCategoryDto($this->createRhEasyCategoryDto());
-        }
-        if ($pageType == EPageType::ORDER_CONFIRMATION) {
-            $rhTrackingScriptLoader->setRhEasyOrderDto($this->createRhEasyOrderDto());
-        }
-        if (isset(Context::getContext()->cookie->roihunter)) {  // add to cart event from previous web page
-            $rhTrackingScriptLoader->setRhEasyCartDto($this->getRhEasyCartDtoFromCookie());
+            $smarty->assign('rhEasyProductDto', $this->createRhEasyProductDto());
         }
 
-        return $rhTrackingScriptLoader->generateJsScriptOutput();
+        if ($pageType == EPageType::CATEGORY) {
+            $smarty->assign('rhEasyCategoryDto', $this->createRhEasyCategoryDto());
+        }
+
+        if ($pageType == EPageType::ORDER_CONFIRMATION) {
+            $smarty->assign('rhEasyOrderDto', $this->createRhEasyOrderDto());
+        }
+
+        if (isset(Context::getContext()->cookie->roihunter)) {  // add to cart event from previous web page
+            $cartDto =  $this->getRhEasyCartDtoFromCookie();
+            if (!empty($cartDto->getCartItems())) {
+                $smarty->assign('rhEasyCartDto', $cartDto);
+            }
+        }
+
+        return $smarty->fetch($this->local_path . 'scripts/rheasy_initialize.tpl');
     }
 
     public function hookActionCartSave($params) {

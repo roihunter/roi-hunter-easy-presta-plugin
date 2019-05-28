@@ -102,6 +102,18 @@ class ROIHunterStorage {
         return self::RH_ACTIVE_BE_PROFILE == self::BE_PROFILE_STAGING_NAME;
     }
 
+    public function trackingParamsAreInitialized() {
+        return $this->googleTrackingParamsAreInitialized() || $this->facebookTrackingParamsAreInitialized();
+    }
+
+    private function googleTrackingParamsAreInitialized() {
+        return !empty($this->getGoogleConversionId()) && !empty($this->getGoogleConversionLabel());
+    }
+
+    private function facebookTrackingParamsAreInitialized() {
+        return !empty($this->getFbPixelId());
+    }
+
     private function saveConfigFormValue($key, $value) {
         $key = $this->translateKey($key);
         Configuration::updateValue($key, $value, false, Shop::getGroupFromShop($this->shopId), $this->shopId);
