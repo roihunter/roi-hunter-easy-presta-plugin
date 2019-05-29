@@ -71,7 +71,6 @@ class Roihunter extends Module {
 
     public function install() {
         $retval = parent::install() &&
-            $this->registerHook('header') &&
             $this->registerHook('backOfficeHeader') &&
             $this->registerHook('displayFooter') &&
             $this->registerHook('actionCartSave') &&
@@ -162,11 +161,6 @@ class Roihunter extends Module {
 
         $this->context->controller->addJS($this->_path . 'views/js/back.js');
         $this->context->controller->addCSS($this->_path . 'views/css/back.css');
-    }
-
-    public function hookHeader() {
-        $this->context->controller->addJS($this->_path . '/views/js/front.js');
-        $this->context->controller->addCSS($this->_path . '/views/css/front.css');
     }
 
     public function hookDisplayBackOfficeHeader() {
