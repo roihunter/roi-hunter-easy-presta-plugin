@@ -22,6 +22,9 @@ class ROIHunterStorage {
     /* change to BE_PROFILE_STAGING_NAME if you want app running in staging mode */
     const RH_ACTIVE_BE_PROFILE = self::BE_PROFILE_PRODUCTION_NAME;
 
+    const RH_FE_PRODUCTION_URL = 'https://goostav-fe.roihunter.com';
+    const RH_FE_STAGING_URL = 'https://goostav-fe-staging.roihunter.com';
+
     private static $instance;
 
     private $shopId;
