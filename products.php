@@ -49,7 +49,7 @@ $sql = 'SELECT s.id_product, pa.id_product_attribute FROM
     LIMIT ' . RH_PRODUCT_PER_PAGE . ' OFFSET ' . $offset;
 $items = Db::getInstance()->executeS($sql);
 
-$json = new ProductJson($roihunterModule);
+$json = new ProductJson($roihunterModule->getImageType());
 $jsonData = [];
 foreach ($items as $item) {
     $jsonData[] = $json->getJson($item['id_product'], $item['id_product_attribute'], $id_lang, $id_shop);

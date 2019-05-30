@@ -3,12 +3,12 @@
 class ProductJson {
     protected $product;
     protected $current_id_product = 0;
-    protected $instance;
+    protected $imageType;
     protected $categoryCache = [];
     protected static $_separator = ' > ';
 
-    public function __construct($instance) {
-        $this->instance = $instance;
+    public function __construct($imageType) {
+        $this->imageType = $imageType;
     }
 
     public function getJson($id_product, $id_product_attribute, $id_lang, $id_shop) {
@@ -160,7 +160,7 @@ class ProductJson {
             if (!isset($retval[$image['id_image']])) {
                 $retval[$image['id_image']] = [
                     'cover' => $image['cover'],
-                    'url' => $link->getImageLink($name, $product['id_product'] . '-' . $image['id_image'], $this->instance->getImageType()),
+                    'url' => $link->getImageLink($name, $product['id_product'] . '-' . $image['id_image'], $this->imageType),
                     'attributes' => [(int)$image['id_product_attribute']]];
             } else {
                 $retval[$image['id_image']]['attributes'][] = (int)$image['id_product_attribute'];
