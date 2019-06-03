@@ -491,10 +491,7 @@ class Roihunter extends Module {
     private function createRhEasyCartItemDto() {
 
         $productId = (int)Tools::getValue("id_product");
-        $variantId = null;
-        if (Tools::getValue("ipa")) {
-            $variantId = (int)Tools::getValue("ipa");
-        }
+        $variantId = $this->getVariantId($productId);
         $quantity = (int)Tools::getValue('qty');
         $price = Product::getPriceStatic($productId, $this->useTax(), $variantId);
 
@@ -507,6 +504,63 @@ class Roihunter extends Module {
         return new RhEasyCartItemDto(
             new RhEasyProductDto($productId, $variantId, Product::getProductName($productId), $roundedPrice, $currency->iso_code),
             $quantity);
+    }
+
+    private function getVariantId($productId) {
+        if (Tools::version_compare(_PS_VERSION_, '1.7', '<')) {
+            return $this->v16GetVariantId();
+        } else {
+            return $this->v17GetVariantId($productId);
+        }
+    }
+
+    private function v17GetVariantId($productId) {
+        if (!Tools::getValue("group")) {
+            return null;
+        }
+
+        $allProductVariantsIds = $this->fetchAllVariantsIds($productId);
+        // values of group array are attribute ids (not product attribute ids)
+        // we need to find product attribute id of this product which is variant id in our case
+        foreach (Tools::getValue("group") as $attributeId) {
+            $productAttributeVariantIds = $this->fetchAllProductVariantIdsConnectedWithAttribute($attributeId);
+            // on each iteration we exclude all product variants are not related with our product using intersect
+            // and as the result of all iterations $allProductVariantsIds will be contain only one variant we want to find
+            $allProductVariantsIds = array_intersect($allProductVariantsIds, $productAttributeVariantIds);
+        }
+
+        if (count($allProductVariantsIds) == 1) {
+            // array_intersect returns a map we need to get only value
+            return array_values($allProductVariantsIds)[0];
+        } else {
+            return null;
+        }
+    }
+
+    private function fetchAllProductVariantIdsConnectedWithAttribute($attributeId) {
+        $dbQuery = new DbQuery();
+        $column_name = 'id_product_attribute';
+        $dbQuery->select($column_name);
+        $dbQuery->from('product_attribute_combination');
+        $dbQuery->where('id_attribute = '.$attributeId);
+        return array_column(Db::getInstance()->executeS($dbQuery), $column_name);
+    }
+
+    private function fetchAllVariantsIds($productId) {
+        $dbQuery = new DbQuery();
+        $column_name = 'id_product_attribute';
+        $dbQuery->select($column_name);
+        $dbQuery->from('product_attribute');
+        $dbQuery->where('id_product = '.$productId);
+        return array_column(Db::getInstance()->executeS($dbQuery), $column_name);
+    }
+
+    private function v16GetVariantId() {
+        if (Tools::getValue("ipa")) {
+            return (int)Tools::getValue("ipa");
+        } else {
+            return null;
+        }
     }
 
     private function getRhEasyCartDtoFromCookie() {
