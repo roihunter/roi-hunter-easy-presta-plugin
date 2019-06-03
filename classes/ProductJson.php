@@ -3,12 +3,11 @@
 class ProductJson {
     protected $product;
     protected $current_id_product = 0;
-    protected $instance;
+    protected $imageType;
     protected $categoryCache = [];
-    protected static $_separator = ' > ';
 
-    public function __construct($instance) {
-        $this->instance = $instance;
+    public function __construct($imageType) {
+        $this->imageType = $imageType;
     }
 
     public function getJson($id_product, $id_product_attribute, $id_lang, $id_shop) {
@@ -160,7 +159,7 @@ class ProductJson {
             if (!isset($retval[$image['id_image']])) {
                 $retval[$image['id_image']] = [
                     'cover' => $image['cover'],
-                    'url' => $link->getImageLink($name, $product['id_product'] . '-' . $image['id_image'], $this->instance->getImageType()),
+                    'url' => $link->getImageLink($name, $product['id_product'] . '-' . $image['id_image'], $this->imageType),
                     'attributes' => [(int)$image['id_product_attribute']]];
             } else {
                 $retval[$image['id_image']]['attributes'][] = (int)$image['id_product_attribute'];
@@ -301,42 +300,22 @@ class ProductJson {
         return $features;
     }
 
-    private function getProductDefaultCategory($id_category, $id_lang) {
-        if (!isset($this->categoryCache[$id_category])) {
-            $cats = [];
-            $cats[] = $id_category;
-            $this->getRecursiveCats($id_category, $cats);
-            $this->categoryCache[$id_category] = $this->translateCats($cats, $id_lang);
+    private function getProductDefaultCategory($idCategory, $idLanguage) {
+        if (!isset($this->categoryCache[$idCategory])) {
+            $this->categoryCache[$idCategory] = $this->translateCategory($idCategory, $idLanguage);
         }
-        return empty($this->categoryCache[$id_category]) ? "" : $this->categoryCache[$id_category];
+        return empty($this->categoryCache[$idCategory]) ? "" : $this->categoryCache[$idCategory];
     }
 
-    private function translateCats($cats, $id_lang) {
-        $retval = [];
-        if (is_array($cats)) {
-            $cats = array_reverse($cats);
-            foreach ($cats as $cat) {
-                $sql = 'SELECT name FROM ' . _DB_PREFIX_ . 'category_lang WHERE id_lang=' . (int)$id_lang . ' AND id_category =' . $cat;
-                $name = Db::getInstance()->getValue($sql);
-                if ($name && strlen($name)) {
-                    $retval[] = $name;
-                }
-            }
+    private function translateCategory($idCategory, $idLanguage) {
+        $dbQuery = (new DbQuery())
+            ->select('name')
+            ->from('category_lang')
+            ->where('id_lang = '.$idLanguage)
+            ->where('id_category = '.$idCategory);
 
-        }
-        if (count($retval)) {
-            return implode(self::$_separator, $retval);
-        }
-        return '';
-    }
-
-    private function getRecursiveCats($id_category, &$cats) {
-        $sql = 'SELECT id_parent, is_root_category FROM ' . _DB_PREFIX_ . 'category WHERE id_category = ' . (int)$id_category;
-        $row = Db::getInstance()->getRow($sql);
-        if ((int)$row['id_parent'] && $row['is_root_category'] == 0) {
-            $cats[] = $row['id_parent'];
-            $this->getRecursiveCats($row['id_parent'], $cats);
-        }
+        $categoryName = Db::getInstance()->getValue($dbQuery);
+        return $categoryName;
     }
 
     private function getProductQuantity($product, $id_product_attribute) {
