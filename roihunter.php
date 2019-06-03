@@ -516,7 +516,7 @@ class Roihunter extends Module {
 
     private function v17GetVariantId($productId) {
         if (!Tools::getValue("group")) {
-            return 0;
+            return null;
         }
 
         $allProductVariantsIds = $this->fetchAllVariantsIds($productId);
@@ -533,7 +533,7 @@ class Roihunter extends Module {
             // array_intersect returns a map we need to get only value
             return array_values($allProductVariantsIds)[0];
         } else {
-            return 0;
+            return null;
         }
     }
 
