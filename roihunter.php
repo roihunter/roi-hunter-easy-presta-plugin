@@ -460,7 +460,7 @@ class Roihunter extends Module {
             $price = Product::getPriceStatic($id_product, $this->useTax());
 
             $currency = Context::getContext()->currency->iso_code;
-            $variantId = (int)$this->getProductVariantId($id_product, $refresh);
+            $variantId = $this->getProductVariantId($id_product, $refresh);
 
             return new RhEasyProductDto($id_product, $variantId, $name, $this->roundPrice($price), $currency);
         } else {
@@ -552,7 +552,7 @@ class Roihunter extends Module {
 
     private function v17GetVariantId($productId) {
         if (!Tools::getValue("group")) {
-            return 0;
+            return null;
         }
 
         $allProductVariantsIds = $this->fetchAllVariantsIds($productId);
@@ -569,7 +569,7 @@ class Roihunter extends Module {
             // array_intersect returns a map we need to get only value
             return array_values($allProductVariantsIds)[0];
         } else {
-            return 0;
+            return null;
         }
     }
 
