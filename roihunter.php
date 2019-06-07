@@ -71,11 +71,15 @@ class Roihunter extends Module {
 
     public function install() {
         $retval = parent::install() &&
-            $this->registerHook('header') &&
             $this->registerHook('backOfficeHeader') &&
             $this->registerHook('displayFooter') &&
             $this->registerHook('actionCartSave') &&
             $this->registerHook('displayBackOfficeHeader');
+
+        if (Tools::version_compare(_PS_VERSION_, '1.7.1', '>=')) {
+            $retval &= $this->registerHook('displayProductAdditionalInfo');
+        }
+
         if ($retval) {
             $this->installModuleTab();
             $this->roiHunterStorage->setClientToken($this->getSecureToken());
@@ -92,6 +96,22 @@ class Roihunter extends Module {
     }
 
     /************************** hooks start ******************************/
+
+    /**
+     * This hook we need for tracking product preview event
+     * Note that it works only for prestashop >1.7.1
+     */
+    public function hookDisplayProductAdditionalInfo() {
+        if (Tools::getValue('action') != 'refresh') {
+            return '';
+        }
+
+        $smarty = new Smarty();
+        $smarty->assign('rhEasyProductDto', $this->createRhEasyProductDto(true));
+        $smarty->assign('activeProfile', $this->roiHunterStorage->getActiveBeProfile());
+        return $smarty->fetch($this->local_path . 'scripts/product_preview.tpl') .
+            $smarty->fetch($this->local_path . 'scripts/rheasy_events_tracking.tpl');
+    }
 
     public function hookDisplayFooter() {
 
@@ -112,7 +132,7 @@ class Roihunter extends Module {
         $smarty->assign('rhEasyPageDto', new RhEasyPageDto($pageType));
 
         if ($pageType == EPageType::PRODUCT) {
-            $smarty->assign('rhEasyProductDto', $this->createRhEasyProductDto());
+            $smarty->assign('rhEasyProductDto', $this->createRhEasyProductDto(false));
         }
 
         if ($pageType == EPageType::CATEGORY) {
@@ -162,11 +182,6 @@ class Roihunter extends Module {
 
         $this->context->controller->addJS($this->_path . 'views/js/back.js');
         $this->context->controller->addCSS($this->_path . 'views/css/back.css');
-    }
-
-    public function hookHeader() {
-        $this->context->controller->addJS($this->_path . '/views/js/front.js');
-        $this->context->controller->addCSS($this->_path . '/views/css/front.css');
     }
 
     public function hookDisplayBackOfficeHeader() {
@@ -431,9 +446,10 @@ class Roihunter extends Module {
 
     /**
      * Get viewed product from DB based on ID in from $_POST
-     * @return RhEasyProductDto
+     * @param $refresh
+     * @return RhEasyProductDto|null
      */
-    private function createRhEasyProductDto() {
+    private function createRhEasyProductDto($refresh) {
 
         $id_product = (int)Tools::getValue('id_product');
         if ($id_product) {
@@ -444,12 +460,32 @@ class Roihunter extends Module {
             $price = Product::getPriceStatic($id_product, $this->useTax());
 
             $currency = Context::getContext()->currency->iso_code;
-            $firstVariantId = (int) Db::getInstance()->getValue('select id_product_attribute from '._DB_PREFIX_.'product_attribute where id_product = '.$id_product);
+            $variantId = $this->getProductVariantId($id_product, $refresh);
 
-            return new RhEasyProductDto($id_product, $firstVariantId, $name, $this->roundPrice($price), $currency);
+            return new RhEasyProductDto($id_product, $variantId, $name, $this->roundPrice($price), $currency);
         } else {
             return null;
         }
+    }
+
+    private function getProductVariantId($productId, $refresh) {
+        if (Tools::version_compare(_PS_VERSION_, '1.7', '<')) {
+            return $this->v16GetProductVariantId($productId);
+        } else {
+            if ($refresh) {
+                return $this->v17GetVariantId($productId);
+            } else {
+                return Tools::getValue('id_product_attribute');
+            }
+        }
+    }
+
+    private function v16GetProductVariantId($idProduct) {
+        $dbQuery = new DbQuery();
+        $dbQuery->select('id_product_attribute');
+        $dbQuery->from('product_attribute');
+        $dbQuery->where('id_product = '.$idProduct);
+        return Db::getInstance()->getValue($dbQuery);
     }
 
     private function createRhEasyCategoryDto() {
@@ -491,10 +527,7 @@ class Roihunter extends Module {
     private function createRhEasyCartItemDto() {
 
         $productId = (int)Tools::getValue("id_product");
-        $variantId = null;
-        if (Tools::getValue("ipa")) {
-            $variantId = (int)Tools::getValue("ipa");
-        }
+        $variantId = $this->getAddToCartVariantId($productId);
         $quantity = (int)Tools::getValue('qty');
         $price = Product::getPriceStatic($productId, $this->useTax(), $variantId);
 
@@ -507,6 +540,63 @@ class Roihunter extends Module {
         return new RhEasyCartItemDto(
             new RhEasyProductDto($productId, $variantId, Product::getProductName($productId), $roundedPrice, $currency->iso_code),
             $quantity);
+    }
+
+    private function getAddToCartVariantId($productId) {
+        if (Tools::version_compare(_PS_VERSION_, '1.7', '<')) {
+            return $this->v16GetAddToCartVariantId();
+        } else {
+            return $this->v17GetVariantId($productId);
+        }
+    }
+
+    private function v17GetVariantId($productId) {
+        if (!Tools::getValue("group")) {
+            return null;
+        }
+
+        $allProductVariantsIds = $this->fetchAllVariantsIds($productId);
+        // values of group array are attribute ids (not product attribute ids)
+        // we need to find product attribute id of this product which is variant id in our case
+        foreach (Tools::getValue("group") as $attributeId) {
+            $productAttributeVariantIds = $this->fetchAllProductVariantIdsConnectedWithAttribute($attributeId);
+            // on each iteration we exclude all product variants are not related with our product using intersect
+            // and as the result of all iterations $allProductVariantsIds will be contain only one variant we want to find
+            $allProductVariantsIds = array_intersect($allProductVariantsIds, $productAttributeVariantIds);
+        }
+
+        if (count($allProductVariantsIds) == 1) {
+            // array_intersect returns a map we need to get only value
+            return array_values($allProductVariantsIds)[0];
+        } else {
+            return null;
+        }
+    }
+
+    private function fetchAllProductVariantIdsConnectedWithAttribute($attributeId) {
+        $dbQuery = new DbQuery();
+        $column_name = 'id_product_attribute';
+        $dbQuery->select($column_name);
+        $dbQuery->from('product_attribute_combination');
+        $dbQuery->where('id_attribute = '.$attributeId);
+        return array_column(Db::getInstance()->executeS($dbQuery), $column_name);
+    }
+
+    private function fetchAllVariantsIds($productId) {
+        $dbQuery = new DbQuery();
+        $column_name = 'id_product_attribute';
+        $dbQuery->select($column_name);
+        $dbQuery->from('product_attribute');
+        $dbQuery->where('id_product = '.$productId);
+        return array_column(Db::getInstance()->executeS($dbQuery), $column_name);
+    }
+
+    private function v16GetAddToCartVariantId() {
+        if (Tools::getValue("ipa")) {
+            return (int)Tools::getValue("ipa");
+        } else {
+            return null;
+        }
     }
 
     private function getRhEasyCartDtoFromCookie() {
