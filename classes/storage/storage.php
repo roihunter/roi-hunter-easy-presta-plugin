@@ -135,6 +135,6 @@ class ROIHunterStorage {
         if ($key == ROIHunterStorage::RH_GOOGLE_CONVERSION_LABEL) { // too long for ps 1.5
             return 'ROIHUNTER_GOOGLE_LABEL';
         }
-        return 'ROIHUNTER_' . strtoupper($key);
+        return 'ROIHUNTER_' . Tools::strtoupper($key);
     }
 }

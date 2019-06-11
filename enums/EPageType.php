@@ -22,7 +22,7 @@ abstract class EPageType {
             case 'index':
                 return EPageType::HOME_PAGE;
             default:
-                return strtoupper($controllerValue);
+                return Tools::strtoupper($controllerValue);
         }
     }
 }

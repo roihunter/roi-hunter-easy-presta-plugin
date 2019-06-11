@@ -409,7 +409,7 @@ class Roihunter extends Module {
     private function getSecureToken() {
         if (function_exists('openssl_random_pseudo_bytes')) {
             $token = openssl_random_pseudo_bytes(32);
-            return substr(bin2hex($token), 0, 32);
+            return Tools::substr(bin2hex($token), 0, 32);
         } else {
             $token = sha1(mt_rand(1, 90000) . _COOKIE_KEY_);
             return base64_encode($token);

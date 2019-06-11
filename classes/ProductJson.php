@@ -62,7 +62,7 @@ class ProductJson {
         }
 
 
-        $description = strlen($product['description_short'] > 0) ? $product['description_short'] : $product['description'];
+        $description = Tools::strlen($product['description_short'] > 0) ? $product['description_short'] : $product['description'];
         $retval['description'] = $this->createDescription($description);
 
         $retval['permalink'] = $this->getProductUrlWithVariants($product, $id_product_attribute);
@@ -172,7 +172,7 @@ class ProductJson {
         if (empty($s))
             return '';
         $s = $this->cs_utf2ascii($s);
-        $s = strtolower($s);
+        $s = Tools::strtolower($s);
         $s = preg_replace('~[^-a-z0-9_ ]+~', '', $s);
         return str_replace(" ", "-", $s);
     }
@@ -247,7 +247,7 @@ class ProductJson {
                     }
                 }
                 $layered = [];
-                if (strlen($in)) {
+                if (Tools::strlen($in)) {
                     $sql = 'SELECT    id_attribute, url_name, meta_title FROM ' . _DB_PREFIX_ . 'layered_indexable_attribute_lang_value  WHERE 
                         id_lang =' . (int)$id_lang . ' AND id_attribute IN (' . $in . ')';
                     $res = Db::getInstance()->executeS($sql);
@@ -266,7 +266,7 @@ class ProductJson {
 
             foreach ($combinations as $combination) {
 
-                $attribute_url = (is_array($layered) && isset($layered[$combination['id_attribute']]) && strlen($layered[$combination['id_attribute']])) ? $layered[$combination['id_attribute']] : self::friendlyAttribute($combination['attribute_name']);
+                $attribute_url = (is_array($layered) && isset($layered[$combination['id_attribute']]) && Tools::strlen($layered[$combination['id_attribute']])) ? $layered[$combination['id_attribute']] : self::friendlyAttribute($combination['attribute_name']);
 
                 $comb_array[$combination['id_product_attribute']]['id_product_attribute'] = $combination['id_product_attribute'];
                 if (Configuration::get('ZBOZI_ATTR_PUBLIC')) {

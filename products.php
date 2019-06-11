@@ -30,9 +30,9 @@ $page = (int)$data['page']?(int)$data['page']:1;
 
 $id_lang = (int)$data['id_lang']?(int)$data['id_lang']:(int)Configuration::get('PS_LANG_DEFAULT', null, null, $id_shop);
 */
-$id_lang = (isset($_GET['id_lang']) && (int)$_GET['id_lang']) ? (int)$_GET['id_lang'] : (int)Configuration::get('PS_LANG_DEFAULT', null, null, $id_shop);
+$id_lang = (Tools::getIsset(Tools::getValue()['id_lang']) && (int)Tools::getValue()['id_lang']) ? (int)Tools::getValue()['id_lang'] : (int)Configuration::get('PS_LANG_DEFAULT', null, null, $id_shop);
 
-$page = (isset($_GET['page']) ? (int) $_GET['page'] : RH_FIRST_PRODUCT_PAGE);
+$page = (Tools::getIsset(Tools::getValue()['page']) ? (int) Tools::getValue()['page'] : RH_FIRST_PRODUCT_PAGE);
 if (!is_numeric($page) || $page < RH_FIRST_PRODUCT_PAGE) {
     header("HTTP/1.1 400 Bad Request");
     echo "Page parameter is not valid.";

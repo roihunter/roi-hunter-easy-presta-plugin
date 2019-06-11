@@ -71,7 +71,7 @@ class ZboziAttributes {
                     }
                 }
                 $layered = [];
-                if (strlen($in)) {
+                if (Tools::strlen($in)) {
                     $sql = 'SELECT	id_attribute, url_name, meta_title FROM ' . _DB_PREFIX_ . 'layered_indexable_attribute_lang_value  WHERE 
 		                id_lang =' . (int)$id_lang . ' AND id_attribute IN (' . $in . ')';
                     $res = Db::getInstance()->executeS($sql);
@@ -90,7 +90,7 @@ class ZboziAttributes {
 
             foreach ($combinations as $combination) {
                 // mod 2.77
-                $attribute_url = (is_array($layered) && isset($layered[$combination['id_attribute']]) && strlen($layered[$combination['id_attribute']])) ? $layered[$combination['id_attribute']] : self::friendlyAttribute($combination['attribute_name']);
+                $attribute_url = (is_array($layered) && isset($layered[$combination['id_attribute']]) && Tools::strlen($layered[$combination['id_attribute']])) ? $layered[$combination['id_attribute']] : self::friendlyAttribute($combination['attribute_name']);
 
 
                 $comb_array[$combination['id_product_attribute']]['id_product_attribute'] = $combination['id_product_attribute'];
@@ -232,7 +232,7 @@ class cMap {
                     $cache_path = dirname(__FILE__) . '/cache/' . $this->function;
             }
 
-            return json_decode(file_get_contents($cache_path), true);
+            return json_decode(Tools::file_get_contents($cache_path), true);
         }
     }
 

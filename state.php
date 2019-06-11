@@ -16,7 +16,7 @@ $id_shop = $roihunterModule->getShopFromUrl($_SERVER['HTTP_HOST']);
 Context::getContext()->shop->id = $id_shop;
 
 if ($_SERVER['REQUEST_METHOD'] == 'PUT') {
-    $stream = file_get_contents('php://input');
+    $stream = Tools::file_get_contents('php://input');
     $data = json_decode($stream, true);
 
     if ($data[ROIHunterStorage::RH_SYSTEM_USER_ID] != null && !is_int($data[ROIHunterStorage::RH_SYSTEM_USER_ID])) {
