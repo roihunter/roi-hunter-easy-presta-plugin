@@ -52,7 +52,7 @@ class Roihunter extends Module {
     private $rhRequestsManager;
 
     public function __construct() {
-        $this->name = self::ROI_HUNTER_MODULE_NAME;
+        $this->name = 'roihunter';
         $this->tab = 'advertising_marketing';
         $this->version = '1.0.0';
         $this->author = 'ROI Hunter';
