@@ -58,6 +58,7 @@ class Roihunter extends Module {
         $this->author = 'ROI Hunter';
         $this->need_instance = 1;
         $this->bootstrap = true;
+        $this->module_key = '9e27146b6c90536cfb3e60a6adb4a054';
         parent::__construct();
 
         $this->displayName = $this->l('ROI Hunter Easy');
