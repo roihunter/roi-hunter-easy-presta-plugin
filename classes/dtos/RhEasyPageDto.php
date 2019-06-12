@@ -1,16 +1,18 @@
 <?php
 
-class RhEasyPageDto {
-
+class RhEasyPageDto
+{
     //dto has public fields because json_encode()
 
     public $type;
 
-    public function __construct($type) {
+    public function __construct($type)
+    {
         $this->type = $type;
     }
 
-    public function toJson() {
+    public function toJson()
+    {
         return json_encode($this);
     }
 }

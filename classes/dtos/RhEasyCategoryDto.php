@@ -1,19 +1,21 @@
 <?php
 
-class RhEasyCategoryDto {
+class RhEasyCategoryDto
+{
 
     //dto has public fields because json_encode()
 
     public $categoryId;
     public $products;
 
-    public function __construct($categoryId, $products) {
+    public function __construct($categoryId, $products)
+    {
         $this->categoryId = $categoryId;
         $this->products = $products;
     }
 
-    public static function fromPrestaShopCategoryProducts($categoryId, $products) {
-
+    public static function fromPrestaShopCategoryProducts($categoryId, $products)
+    {
         $rhEasyProducts = [];
         foreach ($products as $product) {
             $variantId = null;
@@ -25,7 +27,8 @@ class RhEasyCategoryDto {
         return new RhEasyCategoryDto($categoryId, $rhEasyProducts);
     }
 
-    public function toJson() {
+    public function toJson()
+    {
         return json_encode($this);
     }
 }

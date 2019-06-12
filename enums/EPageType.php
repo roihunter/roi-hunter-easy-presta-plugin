@@ -1,7 +1,7 @@
 <?php
 
-abstract class EPageType {
-
+abstract class EPageType
+{
     const PRODUCT = 'PRODUCT';
     const CATEGORY = 'CATEGORY';
     const CART = 'CART';
@@ -9,7 +9,8 @@ abstract class EPageType {
     const HOME_PAGE = 'HOME_PAGE';
     const UNKNOWN = 'UNKNOWN';
 
-    public static function fromPrestaShopController($controllerValue) {
+    public static function fromPrestaShopController($controllerValue)
+    {
         switch ($controllerValue) {
             case 'product':
                 return EPageType::PRODUCT;

@@ -16,11 +16,12 @@
  * @version    1.0
  * @link       http://www.prestahost.eu
  */
-class ZboziAttributes {
+class ZboziAttributes
+{
     public static $debugData = [];
 
-    public static function getProductAttributes($id_product, $id_lang, $id_shop, $debug = false) {
-
+    public static function getProductAttributes($id_product, $id_lang, $id_shop, $debug = false)
+    {
         $id_shop = Context::getContext()->shop->id;
         $id_shop_group = Shop::getGroupFromShop($id_shop);
         $Group = new ShopGroup($id_shop_group);
@@ -56,12 +57,10 @@ class ZboziAttributes {
         $comb_array = [];
 
         if (is_array($combinations)) {
-
             $layered = false;
             $uselayered = Configuration::get('ZBOZI_LAYERED');
 
             if (Module::isInstalled('blocklayered') && Module::isEnabled('blocklayered') && $uselayered) {
-
                 $in = '';
                 $carka = '';
                 foreach ($combinations as $combination) {
@@ -75,14 +74,15 @@ class ZboziAttributes {
                     $sql = 'SELECT	id_attribute, url_name, meta_title FROM ' . _DB_PREFIX_ . 'layered_indexable_attribute_lang_value  WHERE 
 		                id_lang =' . (int)$id_lang . ' AND id_attribute IN (' . $in . ')';
                     $res = Db::getInstance()->executeS($sql);
-                    if ($res && is_array($res))
+                    if ($res && is_array($res)) {
                         foreach ($res as $atr) {
                             if (!empty($atr['meta_title'])) {
                                 $layered[$atr['id_attribute']] = $atr['meta_title'];
-                            } else if ($uselayered == 2) {
+                            } elseif ($uselayered == 2) {
                                 $layered[$atr['id_attribute']] = $atr['url_name'];
                             }
                         }
+                    }
                 }
 
                 reset($combinations);
@@ -109,34 +109,35 @@ class ZboziAttributes {
                 $comb_array[$combination['id_product_attribute']]['quantity'] = $combination['quantity'];
                 $comb_array[$combination['id_product_attribute']]['id_product'] = $combination['id_product'];
                 $comb_array[$combination['id_product_attribute']]['id_image'] = $combination['id_image'];
-
             }
         }
 
 
         return $comb_array;
-
     }
 
 
-    private static function friendlyAttribute($val) {
+    private static function friendlyAttribute($val)
+    {
         $val = str_replace(Configuration::get('PS_ATTRIBUTE_ANCHOR_SEPARATOR'), '_', Tools::link_rewrite(str_replace([',', '.'], '-', $val)));
         return $val;
     }
 
-    public static function getProductFeatures($id_product) {
+    public static function getProductFeatures($id_product)
+    {
         global $id_lang;
         $features = Product::getFrontFeaturesStatic($id_lang, $id_product);
         return $features;
     }
 }
 
-class cMap {
-
+class cMap
+{
     private $function;
 
 
-    public function __construct($function) {
+    public function __construct($function)
+    {
         $this->function = $function;
     }
 
@@ -144,7 +145,8 @@ class cMap {
      * get eshop category tree
      *
      */
-    public function getTree($maxdepth, $id_lang) {
+    public function getTree($maxdepth, $id_lang)
+    {
         $field = $this->function . '_category';
         $resultIds = [];
         $resultParents = [];
@@ -178,20 +180,19 @@ class cMap {
         }
 
         return $this->getTreeRecursive($resultParents, $resultIds, $maxdepth, (isset($category) ? $category->id : null));
-
     }
 
     /**
      * builds heureka tree from stored map
      *
      */
-    public function buildTaxonomyTree($state, $id_lang) {
+    public function buildTaxonomyTree($state, $id_lang)
+    {
         $field = $this->function . '_category';
 
         $sql = 'SHOW COLUMNS FROM  ' . _DB_PREFIX_ . 'category_lang LIKE "' . $field . '"';
         $test = Db::getInstance()->executeS($sql);
         if ($test && is_array($test)) {
-
             if ($state == 'start') {
                 $retval = [];
 
@@ -226,10 +227,11 @@ class cMap {
                 }
                 file_put_contents($cache_path, json_encode($retval));
             } else {
-                if (Shop::isFeatureActive() && (int)Shop::getContextShopID())
+                if (Shop::isFeatureActive() && (int)Shop::getContextShopID()) {
                     $cache_path = dirname(__FILE__) . '/cache/' . $this->function . '_' . (int)Shop::getContextShopID();
-                else
+                } else {
                     $cache_path = dirname(__FILE__) . '/cache/' . $this->function;
+                }
             }
 
             return json_decode(Tools::file_get_contents($cache_path), true);
@@ -237,14 +239,18 @@ class cMap {
     }
 
 
-    private function getTreeRecursive($resultParents, $resultIds, $maxDepth, $id_category = null, $currentDepth = 0) {
-        if (is_null($id_category))
+    private function getTreeRecursive($resultParents, $resultIds, $maxDepth, $id_category = null, $currentDepth = 0)
+    {
+        if (is_null($id_category)) {
             $id_category = Context::getContext()->shop->getCategory();
+        }
 
         $children = [];
-        if (isset($resultParents[$id_category]) && count($resultParents[$id_category]) && ($maxDepth == 0 || $currentDepth < $maxDepth))
-            foreach ($resultParents[$id_category] as $subcat)
+        if (isset($resultParents[$id_category]) && count($resultParents[$id_category]) && ($maxDepth == 0 || $currentDepth < $maxDepth)) {
+            foreach ($resultParents[$id_category] as $subcat) {
                 $children[] = $this->getTreeRecursive($resultParents, $resultIds, $maxDepth, $subcat['id_category'], $currentDepth + 1);
+            }
+        }
 
         if (!isset($resultIds[$id_category])) {
             $return = [
@@ -254,7 +260,6 @@ class cMap {
                 'level' => $currentDepth,
                 'mapped' => '',
             ];
-
         } else {
             $return = [
                 'id' => $id_category,
@@ -270,11 +275,12 @@ class cMap {
 }
 
 if (!class_exists('GoogleCombinations')) {
-    class GoogleCombinations extends FilterCombinations {
+    class GoogleCombinations extends FilterCombinations
+    {
         protected $id_item_group = 0;
 
-
-        protected function filterAttributes($attributes, $googleAttributes, &$removed) {
+        protected function filterAttributes($attributes, $googleAttributes, &$removed)
+        {
             $retval = [];
 
             foreach ($attributes as $attribute) {
@@ -289,32 +295,33 @@ if (!class_exists('GoogleCombinations')) {
             }
             return $retval;
         }
-
-
     }
 }
 
-class FilterCombinations {
+class FilterCombinations
+{
     protected $id_item_group = 0;
     protected $cache = [];
 
-    public function remap(&$combination, $filterAttributes, $id_item_group) {
+    public function remap(&$combination, $filterAttributes, $id_item_group)
+    {
         if ($id_item_group != $this->id_item_group) {
             $this->cache = [];
             $this->id_item_group = $id_item_group;
         }
         $removed = [];
         $attributes = $this->filterAttributes($combination['attributes'], $filterAttributes, $removed);
-        if ($attributes == false)
+        if ($attributes == false) {
             return false;
+        }
 
         $combination['attributes'] = $attributes;
         $combination['removed'] = $removed;
         return $combination;
-
     }
 
-    protected function filterAttributes($attributes, $filterAttributes, &$removed) {
+    protected function filterAttributes($attributes, $filterAttributes, &$removed)
+    {
         $retval = [];
         $cacheLine = '';
         foreach ($attributes as $attribute) {
@@ -334,6 +341,4 @@ class FilterCombinations {
         $this->cache[$cacheLine] = 1;
         return $retval;
     }
-
-
 }

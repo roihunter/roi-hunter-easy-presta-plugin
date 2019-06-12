@@ -1,7 +1,7 @@
 <?php
 
-class RhEasyOrderItemDto {
-
+class RhEasyOrderItemDto
+{
     //dto has public fields because json_encode()
 
     public $product;
@@ -12,7 +12,8 @@ class RhEasyOrderItemDto {
      * @param $product RhEasyProductDto
      * @param $quantity int
      */
-    public function __construct($product, $quantity) {
+    public function __construct($product, $quantity)
+    {
         $this->product = $product;
         $this->quantity = $quantity;
     }

@@ -2,29 +2,29 @@
 
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/storage/storage.php');
 
-class ROIHunterAuthenticator {
-
+class ROIHunterAuthenticator
+{
     private static $instance;
 
     private $serverToken;
     private $client_token;
 
-    private function __construct() {
-
+    private function __construct()
+    {
         $this->serverToken = ROIHunterStorage::getInstance()->getClientToken();
         $this->client_token = $_SERVER["HTTP_X_AUTHORIZATION"];
     }
 
-    public static function getInstance() {
-
+    public static function getInstance()
+    {
         if (!isset(self::$instance)) {
             self::$instance = new ROIHunterAuthenticator();
         }
         return self::$instance;
     }
 
-    public function authenticate() {
-
+    public function authenticate()
+    {
         if (empty($this->serverToken)) {
             header('HTTP/1.1 500 - Internal Server Error - Server authentications is not set. Maybe plugin is not active.', true, 500);
             die();

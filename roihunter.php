@@ -40,8 +40,8 @@ require_once(_PS_MODULE_DIR_ . 'roihunter/classes/dtos/RhEasyPageDto.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/requests/ROIHunterRequestsManager.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/enums/EPageType.php');
 
-class Roihunter extends Module {
-
+class Roihunter extends Module
+{
     const ROI_HUNTER_MODULE_NAME = 'roihunter';
     const ROI_HUNTER_TAB_CLASS_NAME = 'AdminRoihunter';
     const ROI_HUNTER_TAB_NAME = 'ROI Hunter Easy';
@@ -51,7 +51,8 @@ class Roihunter extends Module {
     private $rhEasyCookieManager;
     private $rhRequestsManager;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->name = 'roihunter';
         $this->tab = 'advertising_marketing';
         $this->version = '1.0.0';
@@ -69,7 +70,8 @@ class Roihunter extends Module {
         $this->rhRequestsManager = ROIHunterRequestsManager::getInstance();
     }
 
-    public function install() {
+    public function install()
+    {
         $retval = parent::install() &&
             $this->registerHook('backOfficeHeader') &&
             $this->registerHook('displayFooter') &&
@@ -87,7 +89,8 @@ class Roihunter extends Module {
         return $retval;
     }
 
-    public function uninstall() {
+    public function uninstall()
+    {
         $this->roiHunterStorage->setClientToken(null);
         $this->uninstallModuleTab();
         $this->roiHunterStorage->clearStorage();
@@ -101,7 +104,8 @@ class Roihunter extends Module {
      * This hook we need for tracking product preview event
      * Note that it works only for prestashop >1.7.1
      */
-    public function hookDisplayProductAdditionalInfo() {
+    public function hookDisplayProductAdditionalInfo()
+    {
         if (Tools::getValue('action') != 'refresh') {
             return '';
         }
@@ -113,8 +117,8 @@ class Roihunter extends Module {
             $smarty->fetch($this->local_path . 'scripts/rheasy_events_tracking.tpl');
     }
 
-    public function hookDisplayFooter() {
-
+    public function hookDisplayFooter()
+    {
         if (!$this->roiHunterStorage->trackingParamsAreInitialized()) {
             return '';
         }
@@ -122,11 +126,14 @@ class Roihunter extends Module {
         $smarty = new Smarty();
 
         $pageType = EPageType::fromPrestaShopController(Tools::getValue('controller'));
-        $smarty->assign('rhEasyDto', new RhEasyDto(
-            "PRESTA_SHOP",
-            $this->roiHunterStorage->getGoogleConversionId(),
-            $this->roiHunterStorage->getGoogleConversionLabel(),
-            $this->roiHunterStorage->getFbPixelId())
+        $smarty->assign(
+            'rhEasyDto',
+            new RhEasyDto(
+                "PRESTA_SHOP",
+                $this->roiHunterStorage->getGoogleConversionId(),
+                $this->roiHunterStorage->getGoogleConversionLabel(),
+                $this->roiHunterStorage->getFbPixelId()
+            )
         );
 
         $smarty->assign('rhEasyPageDto', new RhEasyPageDto($pageType));
@@ -156,21 +163,20 @@ class Roihunter extends Module {
             $smarty->fetch($this->local_path . 'scripts/rheasy_events_tracking.tpl');
     }
 
-    public function hookActionCartSave($params) {
-
+    public function hookActionCartSave($params)
+    {
         if ((int)Tools::getValue("id_product") && Tools::getValue('add')) {
+            $rhEasyCookieDto = $this->rhEasyCookieManager->loadRhEasyCookieDto(); //store new item into storage
 
-            //store new item into storage
-            $rhEasyCookieDto = $this->rhEasyCookieManager->loadRhEasyCookieDto();
-
-            $newRhCartItemDto = $this->createRhEasyCartItemDto();   //get cart item from hook
+            $newRhCartItemDto = $this->createRhEasyCartItemDto(); //get cart item from hook
             $rhEasyCookieDto->getRhEasyCartDto()->addItemToCart($newRhCartItemDto);
 
             $this->rhEasyCookieManager->saveRhEasyCookieDto($rhEasyCookieDto);
         }
     }
 
-    private function roundPrice($price, $currency = null) {
+    private function roundPrice($price, $currency = null)
+    {
         if (is_null($currency)) {
             $currency = Context::getContext()->currency;
         }
@@ -178,17 +184,19 @@ class Roihunter extends Module {
         return Tools::ps_round($price, (int)$decimals);
     }
 
-    public function hookBackOfficeHeader() {
-
+    public function hookBackOfficeHeader()
+    {
         $this->context->controller->addJS($this->_path . 'views/js/back.js');
         $this->context->controller->addCSS($this->_path . 'views/css/back.css');
     }
 
-    public function hookDisplayBackOfficeHeader() {
+    public function hookDisplayBackOfficeHeader()
+    {
         return $this->hookBackOfficeHeader();
     }
 
-    private function useTax() {
+    private function useTax()
+    {
         return true;
     }
 
@@ -196,11 +204,13 @@ class Roihunter extends Module {
 
     /************************** controller start ******************************/
 
-    public function getPluginType() {
+    public function getPluginType()
+    {
         return 'rh-easy-prestashop-initial-message';
     }
 
-    public function getStoreUrl($id_shop) {
+    public function getStoreUrl($id_shop)
+    {
         $shopUrl = new ShopUrl($id_shop);
         if (Configuration::get('PS_SSL_ENABLED')) {
             return 'https://'.$shopUrl->domain_ssl.$shopUrl->physical_uri;
@@ -209,7 +219,8 @@ class Roihunter extends Module {
         }
     }
 
-    public function getPreviewUrl($id_shop) {
+    public function getPreviewUrl($id_shop)
+    {
         return null; // to be implemented
     }
 
@@ -220,16 +231,19 @@ class Roihunter extends Module {
      * state.php
      * ... s paramatrem id_shop
      */
-    public function getRhStateApiBaseUrl($id_shop) {
+    public function getRhStateApiBaseUrl($id_shop)
+    {
         return $this->getStoreUrl($id_shop) . 'modules/roihunter/';
     }
 
-    public function getStoreName($id_shop) {
+    public function getStoreName($id_shop)
+    {
         $shop = new Shop($id_shop);
         return $shop->name;
     }
 
-    public function getStoreCurrency($id_shop) {
+    public function getStoreCurrency($id_shop)
+    {
         $id_currency = (int)Configuration::get('PS_CURRENCY_DEFAULT', null, null, $id_shop);
         $currency = new Currency($id_currency);
         if ($currency->active && !$currency->deleted) {
@@ -237,7 +251,8 @@ class Roihunter extends Module {
         }
     }
 
-    public function getStoreLanguage($id_shop) {
+    public function getStoreLanguage($id_shop)
+    {
         $id_language = (int)Configuration::get('PS_LANG_DEFAULT', null, null, $id_shop);
         $language = new Language($id_language);
         if ($language->active) {
@@ -245,20 +260,23 @@ class Roihunter extends Module {
         }
     }
 
-    public function getStoreCountry($id_shop) {
+    public function getStoreCountry($id_shop)
+    {
         $id_country = (int)Configuration::get('PS_COUNTRY_DEFAULT', null, null, $id_shop);
         $country = new Country($id_country);
         return $country->iso_code;
     }
 
-    public function getPluginVersion() {
+    public function getPluginVersion()
+    {
         return 'prestashop_' . $this->version;
     }
 
-    public function getIframeUrl() {
+    public function getIframeUrl()
+    {
         if ($this->roiHunterStorage->isActiveBeProfileProduction()) {
             return ROIHunterStorage::RH_FE_PRODUCTION_URL;
-        } else if ($this->roiHunterStorage->isActiveBeProfileStaging()) {
+        } elseif ($this->roiHunterStorage->isActiveBeProfileStaging()) {
             return ROIHunterStorage::RH_FE_STAGING_URL;
         } else {
             throw new PrestaShopException("Cannot get iframe URL because active profile is not staging or production");
@@ -267,7 +285,8 @@ class Roihunter extends Module {
 
     /************************** controller end ******************************/
 
-    public function getShopFromUrl($url) {
+    public function getShopFromUrl($url)
+    {
         $field = Configuration::get("PS_USE_SSL") ? 'domain_ssl' : 'domain';
         $sql = 'SELECT id_shop FROM ' . _DB_PREFIX_ . 'shop_url WHERE ' . $field . '="' . $url . '" AND active = 1';
         $id_shop = (int)Db::getInstance()->getValue($sql);
@@ -285,7 +304,8 @@ class Roihunter extends Module {
     /**
      * Load the configuration form
      */
-    public function getContent() {
+    public function getContent()
+    {
         $shop_content = self::getAdminShopContext();
         if ($shop_content['multishop'] == true && $shop_content['context'] != 'shop') {
             return '<div class="panel"><h3>' . $this->l('Multishop detected. Please switch to a specific shop!') . '</h3></div>';
@@ -311,7 +331,8 @@ class Roihunter extends Module {
         return $output;
     }
 
-    private function installModuleTab() {
+    private function installModuleTab()
+    {
         if (Tools::version_compare(_PS_VERSION_, '1.7', '<')) {
             $this->v16InstallModuleTab();
         } else {
@@ -319,7 +340,8 @@ class Roihunter extends Module {
         }
     }
 
-    private function v17InstallModuleTab() {
+    private function v17InstallModuleTab()
+    {
         $this->tabs = array(
             array(
                 'name' => self::ROI_HUNTER_TAB_NAME,
@@ -330,7 +352,8 @@ class Roihunter extends Module {
         );
     }
 
-    private function v16InstallModuleTab() {
+    private function v16InstallModuleTab()
+    {
         $sql = 'SELECT id_tab FROM ' . _DB_PREFIX_ . 'tab WHERE class_name ="' . pSQL(self::ROI_HUNTER_TAB_CLASS_NAME) . '"';
         $id_tab = Db::getInstance()->getValue($sql);
         if ((int)$id_tab) {
@@ -362,7 +385,8 @@ class Roihunter extends Module {
         return true;
     }
 
-    public function uninstallModuleTab() {
+    public function uninstallModuleTab()
+    {
         $idTab = Tab::getIdFromClassName(self::ROI_HUNTER_TAB_CLASS_NAME);
         if ($idTab != 0) {
             $tab = new Tab($idTab);
@@ -372,30 +396,32 @@ class Roihunter extends Module {
         return true; // true even on failed
     }
 
-    public function getImageType() {
+    public function getImageType()
+    {
         return Configuration::get('ROIHUNTER_IMAGE_TYPE') ? Configuration::get('ROIHUNTER_IMAGE_TYPE') : '';
     }
 
-    public static function getAdminShopContext() {
+    public static function getAdminShopContext()
+    {
         $retval = [];
         if (Shop::isFeatureActive()) {
             $retval['multishop'] = true;
             switch (Shop::getContext()) {
                 case Shop::CONTEXT_GROUP:
-                    {
-                        $retval['context'] = 'group';
-                        break;
-                    }
+                {
+                    $retval['context'] = 'group';
+                    break;
+                }
                 case Shop::CONTEXT_SHOP:
-                    {
-                        $retval['context'] = 'shop';
-                        break;
-                    }
+                {
+                    $retval['context'] = 'shop';
+                    break;
+                }
                 case Shop::CONTEXT_ALL:
-                    {
-                        $retval['context'] = 'all';
-                        break;
-                    }
+                {
+                    $retval['context'] = 'all';
+                    break;
+                }
             }
             $retval['id_shop_group'] = (int)Shop::getContextShopGroupID();
         } else {
@@ -406,7 +432,8 @@ class Roihunter extends Module {
         return $retval;
     }
 
-    private function getSecureToken() {
+    private function getSecureToken()
+    {
         if (function_exists('openssl_random_pseudo_bytes')) {
             $token = openssl_random_pseudo_bytes(32);
             return Tools::substr(bin2hex($token), 0, 32);
@@ -420,8 +447,8 @@ class Roihunter extends Module {
      * Get module instance
      * @return Roihunter
      */
-    public static function getModuleInstance() {
-
+    public static function getModuleInstance()
+    {
         $roihunterModule = parent::getInstanceByName(self::ROI_HUNTER_MODULE_NAME);
         if ($roihunterModule instanceof Roihunter) {
             return $roihunterModule;
@@ -434,8 +461,8 @@ class Roihunter extends Module {
      * true if presta returned module instance
      * @return bool
      */
-    public static function isModuleLoaded() {
-
+    public static function isModuleLoaded()
+    {
         $roihunterModule = parent::getInstanceByName(self::ROI_HUNTER_MODULE_NAME);
         if ($roihunterModule instanceof Roihunter) {
             return true;
@@ -449,11 +476,10 @@ class Roihunter extends Module {
      * @param $refresh
      * @return RhEasyProductDto|null
      */
-    private function createRhEasyProductDto($refresh) {
-
+    private function createRhEasyProductDto($refresh)
+    {
         $id_product = (int)Tools::getValue('id_product');
         if ($id_product) {
-
             $sql = 'SELECT name FROM ' . _DB_PREFIX_ . 'product_lang WHERE id_product =' . (int)$id_product . ' AND id_lang =' . Context::getContext()->language->id;
             $name = Db::getInstance()->getValue($sql);
 
@@ -468,7 +494,8 @@ class Roihunter extends Module {
         }
     }
 
-    private function getProductVariantId($productId, $refresh) {
+    private function getProductVariantId($productId, $refresh)
+    {
         if (Tools::version_compare(_PS_VERSION_, '1.7', '<')) {
             return $this->v16GetProductVariantId($productId);
         } else {
@@ -480,7 +507,8 @@ class Roihunter extends Module {
         }
     }
 
-    private function v16GetProductVariantId($idProduct) {
+    private function v16GetProductVariantId($idProduct)
+    {
         $dbQuery = new DbQuery();
         $dbQuery->select('id_product_attribute');
         $dbQuery->from('product_attribute');
@@ -488,8 +516,8 @@ class Roihunter extends Module {
         return Db::getInstance()->getValue($dbQuery);
     }
 
-    private function createRhEasyCategoryDto() {
-
+    private function createRhEasyCategoryDto()
+    {
         $id_category = (int)Tools::getValue('id_category');
         if ($id_category) {
             $ref = new ReflectionObject(Context::getContext()->controller);
@@ -505,8 +533,8 @@ class Roihunter extends Module {
         return null;
     }
 
-    private function createRhEasyOrderDto() {
-
+    private function createRhEasyOrderDto()
+    {
         $orderId = (int)Tools::getValue('id_order');
         if ($orderId) {
             $order = new Order($orderId);
@@ -519,13 +547,12 @@ class Roihunter extends Module {
             }
 
             return RhEasyOrderDto::fromPrestaShopOrderProducts($orderId, $currency->iso_code, $order->getProducts(), $this->roundPrice($total_price));
-
         }
         return null;
     }
 
-    private function createRhEasyCartItemDto() {
-
+    private function createRhEasyCartItemDto()
+    {
         $productId = (int)Tools::getValue("id_product");
         $variantId = $this->getAddToCartVariantId($productId);
         $quantity = (int)Tools::getValue('qty');
@@ -539,10 +566,12 @@ class Roihunter extends Module {
 
         return new RhEasyCartItemDto(
             new RhEasyProductDto($productId, $variantId, Product::getProductName($productId), $roundedPrice, $currency->iso_code),
-            $quantity);
+            $quantity
+        );
     }
 
-    private function getAddToCartVariantId($productId) {
+    private function getAddToCartVariantId($productId)
+    {
         if (Tools::version_compare(_PS_VERSION_, '1.7', '<')) {
             return $this->v16GetAddToCartVariantId();
         } else {
@@ -550,7 +579,8 @@ class Roihunter extends Module {
         }
     }
 
-    private function v17GetVariantId($productId) {
+    private function v17GetVariantId($productId)
+    {
         if (!Tools::getValue("group")) {
             return null;
         }
@@ -573,7 +603,8 @@ class Roihunter extends Module {
         }
     }
 
-    private function fetchAllProductVariantIdsConnectedWithAttribute($attributeId) {
+    private function fetchAllProductVariantIdsConnectedWithAttribute($attributeId)
+    {
         $dbQuery = new DbQuery();
         $column_name = 'id_product_attribute';
         $dbQuery->select($column_name);
@@ -582,7 +613,8 @@ class Roihunter extends Module {
         return array_column(Db::getInstance()->executeS($dbQuery), $column_name);
     }
 
-    private function fetchAllVariantsIds($productId) {
+    private function fetchAllVariantsIds($productId)
+    {
         $dbQuery = new DbQuery();
         $column_name = 'id_product_attribute';
         $dbQuery->select($column_name);
@@ -591,7 +623,8 @@ class Roihunter extends Module {
         return array_column(Db::getInstance()->executeS($dbQuery), $column_name);
     }
 
-    private function v16GetAddToCartVariantId() {
+    private function v16GetAddToCartVariantId()
+    {
         if (Tools::getValue("ipa")) {
             return (int)Tools::getValue("ipa");
         } else {
@@ -599,8 +632,8 @@ class Roihunter extends Module {
         }
     }
 
-    private function getRhEasyCartDtoFromCookie() {
-
+    private function getRhEasyCartDtoFromCookie()
+    {
         $rhEasyCookieDto = $this->rhEasyCookieManager->loadRhEasyCookieDto();
         $this->rhEasyCookieManager->clearStorage();
 

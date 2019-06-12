@@ -28,7 +28,7 @@ $roihunterModule = Roihunter::getModuleInstance();
 $id_shop = $roihunterModule->getShopFromUrl($_SERVER['HTTP_HOST']);
 Context::getContext()->shop->id = $id_shop;
 
-// nelze pred contextem eshopu   
+// nelze pred contextem eshopu
 $enabled = true;
 if (!$roihunterModule->active || !Module::isEnabled('roihunter')) {
     $enabled = false;
@@ -49,5 +49,3 @@ header("HTTP/1.1 200 OK");
 header("Content-Type:application/json");
 echo($content);
 die();
-
- 

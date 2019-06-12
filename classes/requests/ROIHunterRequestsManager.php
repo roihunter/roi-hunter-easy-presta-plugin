@@ -3,14 +3,15 @@
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/storage/storage.php');
 
 
-class ROIHunterRequestsManager {
-
+class ROIHunterRequestsManager
+{
     const GOOSTAV_API_PRODUCTION = 'https://goostav.roihunter.com';
     const GOOSTAV_API_STAGING = 'https://goostav-staging.roihunter.com';
 
     private static $instance;
 
-    public static function getInstance() {
+    public static function getInstance()
+    {
         if (!isset(self::$instance)) {
             self::$instance = new ROIHunterRequestsManager();
         }
@@ -20,16 +21,18 @@ class ROIHunterRequestsManager {
     private $accessToken;
     private $baseUrl;
 
-    private function __construct() {
+    private function __construct()
+    {
         $this->accessToken = ROIHunterStorage::getInstance()->getAccessToken();
         if (ROIHunterStorage::getInstance()->isActiveBeProfileProduction()) {
             $this->baseUrl = self::GOOSTAV_API_PRODUCTION;
-        } else if (ROIHunterStorage::getInstance()->isActiveBeProfileStaging()) {
+        } elseif (ROIHunterStorage::getInstance()->isActiveBeProfileStaging()) {
             $this->baseUrl = self::GOOSTAV_API_STAGING;
         }
     }
 
-    public function onAppUninstall() {
+    public function onAppUninstall()
+    {
         try {
             $this->send('/uninstall');
         } catch (Exception $e) {
@@ -37,7 +40,8 @@ class ROIHunterRequestsManager {
         }
     }
 
-    private function send($path) {
+    private function send($path)
+    {
         if ($this->baseUrl == null) {
             error_log('Cannot send the request ' . $path . ' because base URL was not specified');
             return ;
@@ -55,4 +59,3 @@ class ROIHunterRequestsManager {
         curl_close($curl);
     }
 }
-

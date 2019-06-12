@@ -1,6 +1,7 @@
 <?php
 
-class RhEasyDto {
+class RhEasyDto
+{
 
     //dto has public fields because json_encode()
 
@@ -16,7 +17,8 @@ class RhEasyDto {
      * @param $conversionLabel string
      * @param $fbPixelId string
      */
-    public function __construct($platform, $conversionId, $conversionLabel, $fbPixelId) {
+    public function __construct($platform, $conversionId, $conversionLabel, $fbPixelId)
+    {
         $this->platform = $platform;
         $this->conversionId = $conversionId;
         $this->conversionLabel = $conversionLabel;
@@ -24,7 +26,8 @@ class RhEasyDto {
     }
 
 
-    public function toJson() {
+    public function toJson()
+    {
         return json_encode($this);
     }
 }

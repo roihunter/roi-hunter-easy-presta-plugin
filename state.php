@@ -28,9 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'PUT') {
 
     header("HTTP/1.1 200 OK");
     die();
-
-} else if ($_SERVER['REQUEST_METHOD'] == 'GET') {
-
+} elseif ($_SERVER['REQUEST_METHOD'] == 'GET') {
     $content = json_encode(ROIHunterStorage::getInstance()->getStorageWithoutTokens());
     header("HTTP/1.1 200 OK");
     header("Content-Type:application/json");
@@ -40,6 +38,3 @@ if ($_SERVER['REQUEST_METHOD'] == 'PUT') {
     header('HTTP/1.0 405 Method Not Allowed', true, 405);
     die();
 }
- 
- 
- 

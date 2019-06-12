@@ -1,6 +1,7 @@
 <?php
 
-class RhEasyCartItemDto {
+class RhEasyCartItemDto
+{
 
     //dto has public fields because json_encode()
 
@@ -12,7 +13,8 @@ class RhEasyCartItemDto {
      * @param $product RhEasyProductDto
      * @param $quantity int
      */
-    public function __construct($product, $quantity) {
+    public function __construct($product, $quantity)
+    {
         $this->product = $product;
         $this->quantity = $quantity;
     }
@@ -20,25 +22,29 @@ class RhEasyCartItemDto {
     /**
      * @return RhEasyProductDto
      */
-    public function getProduct() {
+    public function getProduct()
+    {
         return $this->product;
     }
 
     /**
      * @return int
      */
-    public function getQuantity() {
+    public function getQuantity()
+    {
         return $this->quantity;
     }
 
     /**
      * @param int $quantity
      */
-    public function setQuantity($quantity) {
+    public function setQuantity($quantity)
+    {
         $this->quantity = $quantity;
     }
 
-    public function toJson() {
+    public function toJson()
+    {
         return json_encode($this);
     }
 }

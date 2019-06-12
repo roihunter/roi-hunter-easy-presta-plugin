@@ -3,17 +3,19 @@
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/storage/storage.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/roihunter.php');
 
-class AdminRoihunterController extends AdminController {
-
+class AdminRoihunterController extends AdminController
+{
     private $roihunterModule;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->bootstrap = true;
         $this->roihunterModule = Roihunter::getModuleInstance();
         parent::__construct();
     }
 
-    public function initContent() {
+    public function initContent()
+    {
         $this->display = 'view';
 
         $shop_context = $this->roihunterModule->getAdminShopContext();
@@ -39,11 +41,7 @@ class AdminRoihunterController extends AdminController {
         $clientToken = $roiHunterStorage->getClientToken();
         if (isset($clientToken) && !isset($params['accessToken'])) {   //we can't send client token if access token exists
             $params['clientToken'] = pSQL($clientToken);
-        }
-        /* 
-        1) dost toho  chybi: google_conversion_id', 'google_conversion_label', 'fb_pixel_id'
-        2) co poslat kdyz jeste neni hodnota ulozena
-        */
+        } // 1) dost toho  chybi: google_conversion_id', 'google_conversion_label', 'fb_pixel_id' 2) co poslat kdyz jeste neni hodnota ulozena
 
         Context::getContext()->smarty->assign(
             [
@@ -56,11 +54,13 @@ class AdminRoihunterController extends AdminController {
         parent::initContent();
     }
 
-    public function renderView() {
+    public function renderView()
+    {
         return parent::renderView();
     }
 
-    public function setHelperDisplay(Helper $helper) {
+    public function setHelperDisplay(Helper $helper)
+    {
         parent::setHelperDisplay($helper);
         $helper->module = $this->roihunterModule;
 
