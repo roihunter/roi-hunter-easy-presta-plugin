@@ -11,8 +11,8 @@
  *
  * @package    zbozi
  * @author    Vaclav Mach <info@prestahost.cz>
- * @copyright 2014,2015 Vaclav Mach
  * @license   EULA
+ * @copyright 2014,2019 Vaclav Mach
  * @version    1.0
  * @link       http://www.prestahost.eu
  */
