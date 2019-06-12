@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Modul Zboží: Srovnávače zboží - export xml pro Prestashop
  *
@@ -9,13 +8,13 @@
  * The buyer is NOT allowed to redistribute this module in anyway or resell it
  * or redistribute it to third party
  *
- * @package    zbozi
  * @author    Vaclav Mach <info@prestahost.cz>
- * @license   EULA
  * @copyright 2014,2019 Vaclav Mach
- * @version    1.0
- * @link       http://www.prestahost.eu
+ * @license   EULA
+ * @version   1.0
+ * @link      http://www.prestahost.eu
  */
+
 class ZboziAttributes
 {
     public static $debugData = [];

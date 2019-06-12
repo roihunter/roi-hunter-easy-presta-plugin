@@ -8,8 +8,8 @@
 * @author    ROI Hunter Easy
 * @copyright 2014-2019 ROI Hunter
 * @license   EULA
-* @version    1.0
-* @link       https://easy.roihunter.com/
+* @version   1.0
+* @link      https://easy.roihunter.com/
 */
 {if $activeProfile == 'production'}
     <script src="https://storage.googleapis.com/goostav-static-files-master/presta-tracking.js" async></script>

@@ -1,18 +1,19 @@
 /**
-* PHP version 5
+* This template file contains script which initialize RhEasy global object
+*
+* We use RhEasy object as storage contains all neccessary information nedded to fire remarketing events
 *
 * LICENSE: The buyer can free use/edit/modify this software in anyway
 * The buyer is NOT allowed to redistribute this module in anyway or resell it
 * or redistribute it to third party
 *
 * @author    ROI Hunter Easy
-* @copyright 2014-2019 ROI Hunter
+* @copyright 2019 ROI Hunter
 * @license   EULA
-* @version    1.0
-* @link       https://easy.roihunter.com/
+* @version   1.0
+* @link      https://easy.roihunter.com/
 */
-{* This template file contains script which initialize RhEasy global object *}
-{* We use RhEasy object as storage contains all neccessary information nedded to fire remarketing events *}
+
 <script>
     (function () {
         {if isset($rhEasyDto)}
