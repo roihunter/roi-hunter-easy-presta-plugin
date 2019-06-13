@@ -46,7 +46,7 @@ class ProductJson
         return $this->getJsonRow($product, $id_product_attribute);
     }
 
-    private function getSingleProduct($id_product, $id_lang, $id_shop)
+    private function getSingleProduct($id_product, $id_lang)
     {
         $sql = 'SELECT p.*, product_shop.*, pl.* , m.`name` AS manufacturer_name, s.`name` AS supplier_name, sa.quantity
             FROM `' . _DB_PREFIX_ . 'product` p
@@ -67,7 +67,7 @@ class ProductJson
 
             return ($rq[0]);
         }
-        return;
+        return null;
     }
 
     private function getProductDefaultCategory($idCategory, $idLanguage)
@@ -140,7 +140,7 @@ class ProductJson
         return strtr($s, $tbl);
     }
 
-    private function getProductUrl($product, $id_product_attribute, $id_lang, $id_shop)
+    private function getProductUrl($product, $id_product_attribute, $id_lang)
     {
         $placeholder = null;
         if (Tools::version_compare(_PS_VERSION_, '1.7', '>') && (int)$id_product_attribute) {
@@ -152,7 +152,7 @@ class ProductJson
         return $url;
     }
 
-    private function getProductAttributes($id_product, $id_product_attribute, $id_lang, $id_shop, $debug = false)
+    private function getProductAttributes($id_product, $id_product_attribute, $id_lang)
     {
         $id_shop = Context::getContext()->shop->id;
         $id_shop_group = Shop::getGroupFromShop($id_shop);
