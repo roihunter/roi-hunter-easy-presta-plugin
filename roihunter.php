@@ -401,20 +401,14 @@ class Roihunter extends Module
             $retval['multishop'] = true;
             switch (Shop::getContext()) {
                 case Shop::CONTEXT_GROUP:
-                {
                     $retval['context'] = 'group';
                     break;
-                }
                 case Shop::CONTEXT_SHOP:
-                {
                     $retval['context'] = 'shop';
                     break;
-                }
                 case Shop::CONTEXT_ALL:
-                {
                     $retval['context'] = 'all';
                     break;
-                }
             }
             $retval['id_shop_group'] = (int)Shop::getContextShopGroupID();
         } else {
