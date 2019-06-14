@@ -27,7 +27,7 @@
 
 {block name="override_tpl"}
     <script type="text/javascript">
-    var admin_order_tab_link = "{$link->getAdminLink('AdminRoihunter')|addslashes}";
+    var admin_order_tab_link = "{addslashes($link->getAdminLink('AdminRoihunter'))}";
  
      function iFrameLoad() {
        
