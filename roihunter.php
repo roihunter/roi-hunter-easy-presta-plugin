@@ -208,11 +208,6 @@ class Roihunter extends Module
         }
     }
 
-    public function getPreviewUrl($id_shop)
-    {
-        return null; // to be implemented
-    }
-
     /**
      * konkretni endpointy jsou
      * check.php
