@@ -39,7 +39,8 @@ class ROIHunterAuthenticator
     public function authenticate()
     {
         if (empty($this->serverToken)) {
-            header('HTTP/1.1 500 - Internal Server Error - Server authentications is not set. Maybe plugin is not active.', true, 500);
+            header('HTTP/1.1 500 - Internal Server Error - Server authentications is not set.
+             Maybe plugin is not active.', true, 500);
             die();
         }
         if (empty($this->client_token)) {

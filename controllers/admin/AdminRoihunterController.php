@@ -52,9 +52,9 @@ class AdminRoihunterController extends AdminController
             $params['accessToken'] = pSQL($accessToken);
         }
         $clientToken = $roiHunterStorage->getClientToken();
-        if (isset($clientToken) && !isset($params['accessToken'])) {   //we can't send client token if access token exists
+        if (isset($clientToken) && !isset($params['accessToken'])) { //we can't send client token if access token exists
             $params['clientToken'] = pSQL($clientToken);
-        } // 1) dost toho  chybi: google_conversion_id', 'google_conversion_label', 'fb_pixel_id' 2) co poslat kdyz jeste neni hodnota ulozena
+        } //1) dost toho chybi: google_conversion_id', 'google_conversion_label', 'fb_pixel_id' 2) co poslat bez hodnoty
 
         Context::getContext()->smarty->assign(
             [

@@ -110,7 +110,8 @@ class RhEasyCartDto
     public function findExistingItem($productId, $variantId)
     {
         foreach ($this->cartItems as $cartItem) {
-            if ($cartItem->getProduct()->getProductId() == $productId && $cartItem->getProduct()->getVariantId() == $variantId) {
+            if ($cartItem->getProduct()->getProductId() == $productId &&
+                $cartItem->getProduct()->getVariantId() == $variantId) {
                 return $cartItem;
             }
         }

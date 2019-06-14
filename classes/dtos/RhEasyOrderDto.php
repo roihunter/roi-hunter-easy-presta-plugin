@@ -50,7 +50,13 @@ class RhEasyOrderDto
                 $variantId = $product['product_attribute_id'];
             }
             array_push($rhEasyProducts, new RhEasyOrderItemDto(
-                new RhEasyProductDto((int)$product['product_id'], $variantId, $product['product_name'], $product['unit_price_tax_incl'], $currency),
+                new RhEasyProductDto(
+                    (int)$product['product_id'],
+                    $variantId,
+                    $product['product_name'],
+                    $product['unit_price_tax_incl'],
+                    $currency
+                ),
                 $product['product_quantity']
             ));
         }

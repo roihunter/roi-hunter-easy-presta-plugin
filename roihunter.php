@@ -292,7 +292,9 @@ class Roihunter extends Module
     {
         $shop_content = self::getAdminShopContext();
         if ($shop_content['multishop'] == true && $shop_content['context'] != 'shop') {
-            return '<div class="panel"><h3>' . $this->l('Multishop detected. Please switch to a specific shop!') . '</h3></div>';
+            return '<div class="panel"><h3>' .
+                $this->l('Multishop detected. Please switch to a specific shop!') .
+                '</h3></div>';
         }
 
         $this->context->smarty->assign('module_dir', $this->_path);
@@ -338,7 +340,11 @@ class Roihunter extends Module
 
     private function v16InstallModuleTab()
     {
-        $sql = 'SELECT id_tab FROM ' . _DB_PREFIX_ . 'tab WHERE class_name ="' . pSQL(self::ROI_HUNTER_TAB_CLASS_NAME) . '"';
+        $sql = 'SELECT id_tab FROM ' .
+            _DB_PREFIX_ .
+            'tab WHERE class_name ="' .
+            pSQL(self::ROI_HUNTER_TAB_CLASS_NAME) .
+            '"';
         $id_tab = Db::getInstance()->getValue($sql);
         if ((int)$id_tab) {
             $tab = new Tab($id_tab);
@@ -346,7 +352,10 @@ class Roihunter extends Module
             $tab = new Tab();
         }
 
-        @copy(_PS_MODULE_DIR_ . $this->module->name . '/logo.gif', _PS_IMG_DIR_ . 't/' . self::ROI_HUNTER_TAB_CLASS_NAME . '.gif');
+        @copy(
+            _PS_MODULE_DIR_ . $this->module->name . '/logo.gif',
+            _PS_IMG_DIR_ . 't/' . self::ROI_HUNTER_TAB_CLASS_NAME . '.gif'
+        );
 
         $tabNames = [];
         foreach (Language::getLanguages(false) as $language) {
@@ -464,7 +473,12 @@ class Roihunter extends Module
     {
         $id_product = (int)Tools::getValue('id_product');
         if ($id_product) {
-            $sql = 'SELECT name FROM ' . _DB_PREFIX_ . 'product_lang WHERE id_product =' . (int)$id_product . ' AND id_lang =' . Context::getContext()->language->id;
+            $sql = 'SELECT name FROM ' .
+                _DB_PREFIX_ .
+                'product_lang WHERE id_product =' .
+                (int)$id_product .
+                ' AND id_lang =' .
+                Context::getContext()->language->id;
             $name = Db::getInstance()->getValue($sql);
 
             $price = Product::getPriceStatic($id_product, $this->useTax());
@@ -530,7 +544,12 @@ class Roihunter extends Module
                 $total_price = $order->total_products;   // $order->total_paid_tax_excl;
             }
 
-            return RhEasyOrderDto::fromPrestaShopOrderProducts($orderId, $currency->iso_code, $order->getProducts(), $this->roundPrice($total_price));
+            return RhEasyOrderDto::fromPrestaShopOrderProducts(
+                $orderId,
+                $currency->iso_code,
+                $order->getProducts(),
+                $this->roundPrice($total_price)
+            );
         }
         return null;
     }
@@ -549,7 +568,13 @@ class Roihunter extends Module
         $currency = new Currency($id_currency);
 
         return new RhEasyCartItemDto(
-            new RhEasyProductDto($productId, $variantId, Product::getProductName($productId), $roundedPrice, $currency->iso_code),
+            new RhEasyProductDto(
+                $productId,
+                $variantId,
+                Product::getProductName($productId),
+                $roundedPrice,
+                $currency->iso_code
+            ),
             $quantity
         );
     }
@@ -575,7 +600,7 @@ class Roihunter extends Module
         foreach (Tools::getValue("group") as $attributeId) {
             $productAttributeVariantIds = $this->fetchAllProductVariantIdsConnectedWithAttribute($attributeId);
             // on each iteration we exclude all product variants are not related with our product using intersect
-            // and as the result of all iterations $allProductVariantsIds will be contain only one variant we want to find
+            // and as the result of all iterations $allProductVariantsIds will contain only one variant we want to find
             $allProductVariantsIds = array_intersect($allProductVariantsIds, $productAttributeVariantIds);
         }
 
