@@ -102,8 +102,8 @@ class Roihunter extends Module
         $smarty = new Smarty();
         $smarty->assign('rhEasyProductDto', $this->createRhEasyProductDto(true));
         $smarty->assign('activeProfile', $this->roiHunterStorage->getActiveBeProfile());
-        return $smarty->fetch($this->local_path . 'scripts/product_preview.tpl') .
-            $smarty->fetch($this->local_path . 'scripts/rheasy_events_tracking.tpl');
+        return $smarty->fetch($this->local_path . 'views/templates/front/product_preview.tpl') .
+            $smarty->fetch($this->local_path . 'views/templates/front/rheasy_events_tracking.tpl');
     }
 
     public function hookDisplayFooter()
@@ -148,8 +148,8 @@ class Roihunter extends Module
 
         $smarty->assign('activeProfile', $this->roiHunterStorage->getActiveBeProfile());
 
-        return $smarty->fetch($this->local_path . 'scripts/rheasy_initialize.tpl') .
-            $smarty->fetch($this->local_path . 'scripts/rheasy_events_tracking.tpl');
+        return $smarty->fetch($this->local_path . 'views/templates/front/rheasy_initialize.tpl') .
+            $smarty->fetch($this->local_path . 'views/templates/front/rheasy_events_tracking.tpl');
     }
 
     public function hookActionCartSave($params)
