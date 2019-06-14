@@ -426,7 +426,7 @@ class Roihunter extends Module
             return Tools::substr(bin2hex($token), 0, 32);
         } else {
             $token = sha1(mt_rand(1, 90000) . _COOKIE_KEY_);
-            return base64_encode($token);
+            return $token;
         }
     }
 
