@@ -1,4 +1,17 @@
 <?php
+/**
+ * Make a check of ROI Hunter module
+ *
+ * LICENSE: The buyer can free use/edit/modify this software in anyway
+ * The buyer is NOT allowed to redistribute this module in anyway or resell it
+ * or redistribute it to third party
+ *
+ * @author    ROI Hunter Easy
+ * @copyright 2019 ROI Hunter
+ * @license   EULA
+ * @version   1.0
+ * @link      https://easy.roihunter.com/
+ */
 
 include(dirname(__FILE__) . '/../../config/config.inc.php');
 include(dirname(__FILE__) . '/../../init.php');
@@ -28,7 +41,7 @@ $roihunterModule = Roihunter::getModuleInstance();
 $id_shop = $roihunterModule->getShopFromUrl($_SERVER['HTTP_HOST']);
 Context::getContext()->shop->id = $id_shop;
 
-// nelze pred contextem eshopu   
+// nelze pred contextem eshopu
 $enabled = true;
 if (!$roihunterModule->active || !Module::isEnabled('roihunter')) {
     $enabled = false;
@@ -49,5 +62,3 @@ header("HTTP/1.1 200 OK");
 header("Content-Type:application/json");
 echo($content);
 die();
-
- 

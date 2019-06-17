@@ -1,19 +1,34 @@
 <?php
+/**
+ * Admin ROI Hunter API Controller
+ *
+ * LICENSE: The buyer can free use/edit/modify this software in anyway
+ * The buyer is NOT allowed to redistribute this module in anyway or resell it
+ * or redistribute it to third party
+ *
+ * @author    ROI Hunter Easy
+ * @copyright 2019 ROI Hunter
+ * @license   EULA
+ * @version   1.0
+ * @link      https://easy.roihunter.com/
+ */
 
 require_once(_PS_MODULE_DIR_ . 'roihunter/classes/storage/storage.php');
 require_once(_PS_MODULE_DIR_ . 'roihunter/roihunter.php');
 
-class AdminRoihunterController extends AdminController {
-
+class AdminRoihunterController extends AdminController
+{
     private $roihunterModule;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->bootstrap = true;
         $this->roihunterModule = Roihunter::getModuleInstance();
         parent::__construct();
     }
 
-    public function initContent() {
+    public function initContent()
+    {
         $this->display = 'view';
 
         $shop_context = $this->roihunterModule->getAdminShopContext();
@@ -37,13 +52,9 @@ class AdminRoihunterController extends AdminController {
             $params['accessToken'] = pSQL($accessToken);
         }
         $clientToken = $roiHunterStorage->getClientToken();
-        if (isset($clientToken) && !isset($params['accessToken'])) {   //we can't send client token if access token exists
+        if (isset($clientToken) && !isset($params['accessToken'])) { //we can't send client token if access token exists
             $params['clientToken'] = pSQL($clientToken);
-        }
-        /* 
-        1) dost toho  chybi: google_conversion_id', 'google_conversion_label', 'fb_pixel_id'
-        2) co poslat kdyz jeste neni hodnota ulozena
-        */
+        } //1) dost toho chybi: google_conversion_id', 'google_conversion_label', 'fb_pixel_id' 2) co poslat bez hodnoty
 
         Context::getContext()->smarty->assign(
             [
@@ -56,11 +67,13 @@ class AdminRoihunterController extends AdminController {
         parent::initContent();
     }
 
-    public function renderView() {
+    public function renderView()
+    {
         return parent::renderView();
     }
 
-    public function setHelperDisplay(Helper $helper) {
+    public function setHelperDisplay(Helper $helper)
+    {
         parent::setHelperDisplay($helper);
         $helper->module = $this->roihunterModule;
 

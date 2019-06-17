@@ -1,4 +1,17 @@
 <?php
+/**
+ * Get Products
+ *
+ * LICENSE: The buyer can free use/edit/modify this software in anyway
+ * The buyer is NOT allowed to redistribute this module in anyway or resell it
+ * or redistribute it to third party
+ *
+ * @author    ROI Hunter Easy
+ * @copyright 2019 ROI Hunter
+ * @license   EULA
+ * @version   1.0
+ * @link      https://easy.roihunter.com/
+ */
 
 include(dirname(__FILE__) . '/../../config/config.inc.php');
 include(dirname(__FILE__) . '/../../init.php');
@@ -30,9 +43,19 @@ $page = (int)$data['page']?(int)$data['page']:1;
 
 $id_lang = (int)$data['id_lang']?(int)$data['id_lang']:(int)Configuration::get('PS_LANG_DEFAULT', null, null, $id_shop);
 */
-$id_lang = (isset($_GET['id_lang']) && (int)$_GET['id_lang']) ? (int)$_GET['id_lang'] : (int)Configuration::get('PS_LANG_DEFAULT', null, null, $id_shop);
+$id_lang = (
+    Tools::getIsset(Tools::getValue()['id_lang']) &&
+    (int)Tools::getValue()['id_lang']
+) ?
+    (int)Tools::getValue()['id_lang'] :
+    (int)Configuration::get(
+        'PS_LANG_DEFAULT',
+        null,
+        null,
+        $id_shop
+    );
 
-$page = (isset($_GET['page']) ? (int) $_GET['page'] : RH_FIRST_PRODUCT_PAGE);
+$page = (Tools::getIsset(Tools::getValue()['page']) ? (int) Tools::getValue()['page'] : RH_FIRST_PRODUCT_PAGE);
 if (!is_numeric($page) || $page < RH_FIRST_PRODUCT_PAGE) {
     header("HTTP/1.1 400 Bad Request");
     echo "Page parameter is not valid.";
@@ -59,5 +82,3 @@ header("HTTP/1.1 200 OK");
 header("Content-Type:application/json");
 echo json_encode($jsonData);
 die();
-
-

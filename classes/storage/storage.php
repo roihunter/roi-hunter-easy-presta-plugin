@@ -1,7 +1,20 @@
 <?php
+/**
+ * Manage (store, load) ROI Hunter data in Database
+ *
+ * LICENSE: The buyer can free use/edit/modify this software in anyway
+ * The buyer is NOT allowed to redistribute this module in anyway or resell it
+ * or redistribute it to third party
+ *
+ * @author    ROI Hunter Easy
+ * @copyright 2019 ROI Hunter
+ * @license   EULA
+ * @version   1.0
+ * @link      https://easy.roihunter.com/
+ */
 
-class ROIHunterStorage {
-
+class ROIHunterStorage
+{
     const RH_SYSTEM_USER_ID = 'id';
     const RH_ACCESS_TOKEN = 'access_token';
     const RH_GOOGLE_CONVERSION_ID = 'google_conversion_id';
@@ -29,19 +42,21 @@ class ROIHunterStorage {
 
     private $shopId;
 
-    private function __construct() {
+    private function __construct()
+    {
         $this->shopId = Context::getContext()->shop->id;
     }
 
-    public static function getInstance() {
-
+    public static function getInstance()
+    {
         if (!isset(self::$instance)) {
             self::$instance = new ROIHunterStorage();
         }
         return self::$instance;
     }
 
-    public function getStorageWithoutTokens() {
+    public function getStorageWithoutTokens()
+    {
         $content = [];
         foreach (ROIHunterStorage::STATE_STORAGE_KEYS as $key) {
             if ($key != ROIHunterStorage::RH_ACCESS_TOKEN) {   //do not send rh access token, we don't need it
@@ -51,78 +66,94 @@ class ROIHunterStorage {
         return $content;
     }
 
-    public function setStorage($data) {
-
+    public function setStorage($data)
+    {
         foreach (ROIHunterStorage::STATE_STORAGE_KEYS as $key) {
             $this->saveConfigFormValue($key, $data[$key]);
         }
     }
 
-    public function clearStorage() {
+    public function clearStorage()
+    {
         foreach (self::STATE_STORAGE_KEYS as $key) {
             $key = $this->translateKey($key);
             Configuration::deleteByName($key);
         }
     }
 
-    public function getSystemUserId() {
+    public function getSystemUserId()
+    {
         return $this->getConfigFormValue(self::RH_SYSTEM_USER_ID);
     }
 
-    public function getAccessToken() {
+    public function getAccessToken()
+    {
         return $this->getConfigFormValue(self::RH_ACCESS_TOKEN);
     }
 
-    public function getGoogleConversionId() {
+    public function getGoogleConversionId()
+    {
         return $this->getConfigFormValue(self::RH_GOOGLE_CONVERSION_ID);
     }
 
-    public function getGoogleConversionLabel() {
+    public function getGoogleConversionLabel()
+    {
         return $this->getConfigFormValue(self::RH_GOOGLE_CONVERSION_LABEL);
     }
 
-    public function getFbPixelId() {
+    public function getFbPixelId()
+    {
         return $this->getConfigFormValue(self::RH_FB_PIXEL_ID);
     }
 
-    public function getClientToken() {
+    public function getClientToken()
+    {
         return $this->getConfigFormValue(self::RH_CLIENT_TOKEN);
     }
 
-    public function setClientToken($value) {
+    public function setClientToken($value)
+    {
         $this->saveConfigFormValue(self::RH_CLIENT_TOKEN, $value);
     }
 
-    public function getActiveBeProfile() {
+    public function getActiveBeProfile()
+    {
         return self::RH_ACTIVE_BE_PROFILE;
     }
 
-    public function isActiveBeProfileProduction() {
+    public function isActiveBeProfileProduction()
+    {
         return self::RH_ACTIVE_BE_PROFILE == self::BE_PROFILE_PRODUCTION_NAME;
     }
 
-    public function isActiveBeProfileStaging() {
+    public function isActiveBeProfileStaging()
+    {
         return self::RH_ACTIVE_BE_PROFILE == self::BE_PROFILE_STAGING_NAME;
     }
 
-    public function trackingParamsAreInitialized() {
+    public function trackingParamsAreInitialized()
+    {
         return $this->googleTrackingParamsAreInitialized() || $this->facebookTrackingParamsAreInitialized();
     }
 
-    private function googleTrackingParamsAreInitialized() {
+    private function googleTrackingParamsAreInitialized()
+    {
         return !empty($this->getGoogleConversionId()) && !empty($this->getGoogleConversionLabel());
     }
 
-    private function facebookTrackingParamsAreInitialized() {
+    private function facebookTrackingParamsAreInitialized()
+    {
         return !empty($this->getFbPixelId());
     }
 
-    private function saveConfigFormValue($key, $value) {
+    private function saveConfigFormValue($key, $value)
+    {
         $key = $this->translateKey($key);
         Configuration::updateValue($key, $value, false, Shop::getGroupFromShop($this->shopId), $this->shopId);
     }
 
-    private function getConfigFormValue($key) {
+    private function getConfigFormValue($key)
+    {
         $key = $this->translateKey($key);
         $result = Configuration::get($key, null, Shop::getGroupFromShop($this->shopId), $this->shopId);
         if ($result === false) {
@@ -131,10 +162,11 @@ class ROIHunterStorage {
         return $result;
     }
 
-    private function translateKey($key) {
+    private function translateKey($key)
+    {
         if ($key == ROIHunterStorage::RH_GOOGLE_CONVERSION_LABEL) { // too long for ps 1.5
             return 'ROIHUNTER_GOOGLE_LABEL';
         }
-        return 'ROIHUNTER_' . strtoupper($key);
+        return 'ROIHUNTER_' . Tools::strtoupper($key);
     }
 }

@@ -1,6 +1,17 @@
 <?php
-
-// set module state from external source
+/**
+ * Process ROI Hunter API response
+ *
+ * LICENSE: The buyer can free use/edit/modify this software in anyway
+ * The buyer is NOT allowed to redistribute this module in anyway or resell it
+ * or redistribute it to third party
+ *
+ * @author    ROI Hunter Easy
+ * @copyright 2019 ROI Hunter
+ * @license   EULA
+ * @version   1.0
+ * @link      https://easy.roihunter.com/
+ */
 
 include(dirname(__FILE__) . '/../../config/config.inc.php');
 include(dirname(__FILE__) . '/../../init.php');
@@ -16,7 +27,7 @@ $id_shop = $roihunterModule->getShopFromUrl($_SERVER['HTTP_HOST']);
 Context::getContext()->shop->id = $id_shop;
 
 if ($_SERVER['REQUEST_METHOD'] == 'PUT') {
-    $stream = file_get_contents('php://input');
+    $stream = Tools::file_get_contents('php://input');
     $data = json_decode($stream, true);
 
     if ($data[ROIHunterStorage::RH_SYSTEM_USER_ID] != null && !is_int($data[ROIHunterStorage::RH_SYSTEM_USER_ID])) {
@@ -28,9 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'PUT') {
 
     header("HTTP/1.1 200 OK");
     die();
-
-} else if ($_SERVER['REQUEST_METHOD'] == 'GET') {
-
+} elseif ($_SERVER['REQUEST_METHOD'] == 'GET') {
     $content = json_encode(ROIHunterStorage::getInstance()->getStorageWithoutTokens());
     header("HTTP/1.1 200 OK");
     header("Content-Type:application/json");
@@ -40,6 +49,3 @@ if ($_SERVER['REQUEST_METHOD'] == 'PUT') {
     header('HTTP/1.0 405 Method Not Allowed', true, 405);
     die();
 }
- 
- 
- 
