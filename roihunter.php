@@ -52,7 +52,8 @@ class Roihunter extends Module
         parent::__construct();
 
         $this->displayName = $this->l('ROI Hunter Easy');
-        $this->description = $this->l('ROI Hunter Easy addon for PrestaShop');
+        $this->description = $this->l('Re-engage your past visitors and gain new conversions with
+         dynamic remarketing ads on Google and dynamic product ads i.e. dynamic retargeting ads on Facebook.');
         $this->confirmUninstall = $this->l('');
         $this->ps_versions_compliancy = ['min' => '1.6', 'max' => _PS_VERSION_];
         $this->roiHunterStorage = ROIHunterStorage::getInstance();
