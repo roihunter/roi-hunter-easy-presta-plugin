@@ -1,4 +1,4 @@
-/**
+{*
 * We assume that RhEasy object is already initialized on the page
 *
 * LICENSE: The buyer can free use/edit/modify this software in anyway
@@ -10,7 +10,7 @@
 * @license   EULA
 * @version   1.0
 * @link      https://easy.roihunter.com/
-*/
+*}
 
 <script>
     (function () {
