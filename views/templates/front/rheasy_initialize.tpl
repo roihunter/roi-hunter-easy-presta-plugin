@@ -1,4 +1,4 @@
-/**
+{*
 * This template file contains script which initialize RhEasy global object
 *
 * We use RhEasy object as storage contains all neccessary information nedded to fire remarketing events
@@ -12,7 +12,7 @@
 * @license   EULA
 * @version   1.0
 * @link      https://easy.roihunter.com/
-*/
+*}
 
 <script>
     (function () {
