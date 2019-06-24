@@ -177,8 +177,8 @@ class Roihunter extends Module
 
     public function hookBackOfficeHeader()
     {
-        $this->context->controller->addJS($this->_path . 'views/js/back.js');
         $this->context->controller->addCSS($this->_path . 'views/css/back.css');
+        $this->context->controller->addJS($this->_path . 'views/js/back.js');
     }
 
     public function hookDisplayBackOfficeHeader()

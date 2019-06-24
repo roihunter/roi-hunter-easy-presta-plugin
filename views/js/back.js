@@ -11,3 +11,7 @@
  * @version   1.0
  * @link      https://easy.roihunter.com/
 */
+$(window).on('load', function() {
+    $("#subtab-AdminRoihunter").children(0).children(0)[0].className='icon-AdminRoihunter';
+    $(".icon-AdminRoihunter").text('');
+});
