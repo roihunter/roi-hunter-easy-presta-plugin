@@ -11,3 +11,7 @@
  * @version   1.0
  * @link      https://easy.roihunter.com/
 */
+document.addEventListener('DOMContentLoaded', function(event) {
+    document.querySelector("#subtab-AdminRoihunter > .link > .material-icons.mi-extension").className = "icon-AdminRoihunter";
+    document.getElementsByClassName("icon-AdminRoihunter")[0].textContent = '';
+});
