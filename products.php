@@ -43,16 +43,16 @@ $page = (int)$data['page']?(int)$data['page']:1;
 
 $id_lang = (int)$data['id_lang']?(int)$data['id_lang']:(int)Configuration::get('PS_LANG_DEFAULT', null, null, $id_shop);
 */
-$id_lang = (Tools::getIsset(Tools::getValue('id_lang')) && (int)Tools::getValue('id_lang')) ?
-    (int)Tools::getValue('id_lang'):
-    (int)Configuration::get(
+$id_lang = (Tools::getIsset(Tools::getValue('id_lang')) && (int) Tools::getValue('id_lang')) ?
+    (int) Tools::getValue('id_lang'):
+    (int) Configuration::get(
         'PS_LANG_DEFAULT',
         null,
         null,
         $id_shop
     );
 
-$page = (Tools::getIsset(Tools::getValue('page')) ? (int) Tools::getValue('page') : RH_FIRST_PRODUCT_PAGE);
+$page = (!is_null(Tools::getValue('page')) ? (int) Tools::getValue('page') : RH_FIRST_PRODUCT_PAGE);
 if (!is_numeric($page) || $page < RH_FIRST_PRODUCT_PAGE) {
     header("HTTP/1.1 400 Bad Request");
     echo "Page parameter is not valid.";
@@ -63,7 +63,7 @@ $offset = RH_PRODUCT_PER_PAGE * ($page - RH_FIRST_PRODUCT_PAGE);
 
 $sql = 'SELECT s.id_product, pa.id_product_attribute FROM
     ' . _DB_PREFIX_ . 'product_shop s LEFT JOIN ' . _DB_PREFIX_ . 'product_attribute pa
-    ON s.id_product = pa.id_product AND s.id_shop = ' . (int)$id_shop . ' WHERE
+    ON s.id_product = pa.id_product AND s.id_shop = ' . (int) $id_shop . ' WHERE
     s.active = 1 
     ORDER BY s.id_product, pa.id_product_attribute 
     LIMIT ' . RH_PRODUCT_PER_PAGE . ' OFFSET ' . $offset;
