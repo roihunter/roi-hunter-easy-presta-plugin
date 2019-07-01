@@ -52,7 +52,13 @@ $id_lang = (Tools::getIsset(Tools::getValue('id_lang')) && (int) Tools::getValue
         $id_shop
     );
 
-$page = (!is_null(Tools::getValue('page')) ? (int) Tools::getValue('page') : RH_FIRST_PRODUCT_PAGE);
+
+$page = Tools::getValue('page');
+if (is_null($page) || empty($page)) {
+    $page = RH_FIRST_PRODUCT_PAGE;
+} else {
+    $page = (int) $page;
+}
 if (!is_numeric($page) || $page < RH_FIRST_PRODUCT_PAGE) {
     header("HTTP/1.1 400 Bad Request");
     echo "Page parameter is not valid.";
