@@ -12,23 +12,27 @@
  * @link      https://easy.roihunter.com/
 *}
 
-<div class="panel">
-	<h3><i class="icon icon-credit-card"></i> {l s='ROI Hunter Easy' mod='roihunter'}</h3>
-	 
-	<br />
-	<p>
-		{l s='Create powerful ads for Google and Facebook with ROI Hunter Easy plugin for PrestaShop. Convert past visitors with retargeting and bring new traffic with search ads.' mod='roihunter'}
-	</p>
-</div>
-<!--
-<div class="panel">
-	<h3><i class="icon icon-tags"></i> {l s='Documentation' mod='roihunter'}</h3>
-	<p>
-		&raquo; {l s='You can get a PDF documentation to configure this module' mod='roihunter'} :
-		<ul>
-			<li><a href="#" target="_blank">{l s='English' mod='roihunter'}</a></li>
-			<li><a href="#" target="_blank">{l s='French' mod='roihunter'}</a></li>
-		</ul>
-	</p>
-</div>
--->
+{if $shopContent.multishop == true && $shopContent.context != 'shop'}
+	<div class="panel">
+		<h3>{l s='Multishop detected. Please switch to a specific shop!' mod='roihunter'}</h3>
+	</div>
+{else}
+	<div class="panel">
+		<h3><i class="icon icon-credit-card"></i> {l s='ROI Hunter Easy' mod='roihunter'}</h3>
+
+		<br />
+		<p>
+			{l s='Create powerful ads for Google and Facebook with ROI Hunter Easy plugin for PrestaShop. Convert past visitors with retargeting and bring new traffic with search ads.' mod='roihunter'}
+		</p>
+		<table class="table">
+			<tr><td>rhStateApiBaseUrl</td><td>{$base}</td></tr>
+			<tr><td>state endpoint</td><td>{$base}state.php</td></tr>
+			<tr><td>check   endpoint</td><td>{$base}check.php</td></tr>
+			<tr><td>products endpoint</td><td>{$base}products.php</td></tr>
+			<tr><td>active profile</td><td>{$activeBeProfile}</td></tr>
+			{foreach from=$storageItems key=storageKey item=storageValue}
+				<tr><td>{$storageKey}</td><td>{$storageValue}</td></tr>
+			{/foreach}
+		</table>
+	</div>
+{/if}
