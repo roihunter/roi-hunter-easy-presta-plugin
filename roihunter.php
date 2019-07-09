@@ -150,8 +150,9 @@ class Roihunter extends Module
 
         $smarty->assign('activeProfile', $this->roiHunterStorage->getActiveBeProfile());
 
-        return $smarty->fetch($this->local_path . 'views/templates/front/rheasy_initialize.tpl') .
-            $smarty->fetch($this->local_path . 'views/templates/front/rheasy_events_tracking.tpl');
+        $rheasyInit = $smarty->fetch($this->local_path . 'views/templates/front/rheasy_initialize.tpl');
+        $rheasyTracking = $smarty->fetch($this->local_path . 'views/templates/front/rheasy_events_tracking.tpl');
+        return $rheasyInit . $rheasyTracking;
     }
 
     public function hookActionCartSave($params)
