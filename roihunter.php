@@ -297,30 +297,13 @@ class Roihunter extends Module
     public function getContent()
     {
         $shop_content = self::getAdminShopContext();
-        if ($shop_content['multishop'] == true && $shop_content['context'] != 'shop') {
-            return '<div class="panel"><h3>' .
-                $this->l('Multishop detected. Please switch to a specific shop!') .
-                '</h3></div>';
-        }
-
-        $this->context->smarty->assign('module_dir', $this->_path);
-
-        $output = $this->context->smarty->fetch($this->local_path . 'views/templates/admin/configure.tpl');
         $id_shop = (int)$shop_content['id_shop'];
-        $base = $this->getRhStateApiBaseUrl($id_shop);
-        $output .= '<table class="table">';
-        $output .= '<tr><td>rhStateApiBaseUrl</td><td>' . $base . '</td></tr>';
-        $output .= '<tr><td>state endpoint</td><td>' . $base . 'state.php</td></tr>';
-        $output .= '<tr><td>check   endpoint</td><td>' . $base . 'check.php</td></tr>';
-        $output .= '<tr><td>products endpoint</td><td>' . $base . 'products.php</td></tr>';
-        $output .= '<tr><td>active profile</td><td>' . $this->roiHunterStorage->getActiveBeProfile() . '</td></tr>';
-        foreach ($this->roiHunterStorage->getStorageWithoutTokens() as $key => $value) {
-            $output .= '<tr><td>' . $key . '</td><td>' . $value . '</td></tr>';
-        }
-        $output .= '</table>';
+        $this->context->smarty->assign('shopContent', $shop_content);
+        $this->context->smarty->assign('base', $this->getRhStateApiBaseUrl($id_shop));
+        $this->context->smarty->assign('activeBeProfile', $this->roiHunterStorage->getActiveBeProfile());
+        $this->context->smarty->assign('storageItems', $this->roiHunterStorage->getStorageWithoutTokens());
 
-
-        return $output;
+        return $this->context->smarty->fetch($this->local_path . 'views/templates/admin/configure.tpl');
     }
 
     private function installModuleTab()
