@@ -13,9 +13,9 @@
 *}
 
 {if $activeProfile == 'production'}
-    <script src="https://storage.googleapis.com/goostav-static-files-master/presta-tracking.js" async></script>
+    <script src="https://storage.googleapis.com/goostav-static-files-master/presta-tracking.js" defer></script>
 {elseif $activeProfile == 'staging'}
-    <script src="https://storage.googleapis.com/goostav-static-files-staging/presta-tracking.js" async></script>
+    <script src="https://storage.googleapis.com/goostav-static-files-staging/presta-tracking.js" defer></script>
 {else}
     <script>console.error("Cannot load events tracking script: reason: unknown profile");</script>
 {/if}
