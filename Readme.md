@@ -1,8 +1,8 @@
 # ROI Hunter Easy
 
 ## Installation
-- download our latest **roihunter.zip** file by clicking on this [link](https://github.com/roihunter/roi-hunter-easy-presta-plugin/releases/latest/download/roihunter.zip)
-- go to your **PrestaShop Admin** panel > **Modules** and after clicking **Add a new module** upload roihunter.zip file that you just downloaded
+- download our latest release [**roihunter.zip**](https://github.com/roihunter/roi-hunter-easy-presta-plugin/releases/latest/download/roihunter.zip)
+- go to your **PrestaShop Admin** panel > **Modules** and after clicking **Add a new module** upload [roihunter.zip](https://github.com/roihunter/roi-hunter-easy-presta-plugin/releases/latest/download/roihunter.zip) file that you just downloaded
 - then in modules list use **Search** for "ROI Hunter" and **Install** this module.
 - in your left panel now you can see ROI Hunter Easy where you set up and start your re-marketing.
 
