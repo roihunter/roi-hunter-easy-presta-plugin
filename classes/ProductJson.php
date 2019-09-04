@@ -29,6 +29,9 @@ class ProductJson
     {
         if ($id_product != $this->current_id_product) {
             $this->product = $this->getSingleProduct($id_product, $id_lang, $id_shop);
+            if (!$this->product) {
+                return null;
+            }
             $this->product['category'] = $this->getProductDefaultCategory(
                 $this->product['id_category_default'],
                 $id_lang

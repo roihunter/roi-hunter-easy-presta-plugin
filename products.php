@@ -65,7 +65,10 @@ try {
     $json = new ProductJson($roihunterModule->getImageType());
     $jsonData = [];
     foreach ($items as $item) {
-        $jsonData[] = $json->getJson($item['id_product'], $item['id_product_attribute'], $id_lang, $id_shop);
+        $json_item = $json->getJson($item['id_product'], $item['id_product_attribute'], $id_lang, $id_shop);
+        if ($json_item != null) {
+            $jsonData[] = $json_item;
+        }
     }
 
     header("HTTP/1.1 200 OK");
