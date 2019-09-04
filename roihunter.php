@@ -44,7 +44,7 @@ class Roihunter extends Module
     {
         $this->name = 'roihunter';
         $this->tab = 'advertising_marketing';
-        $this->version = '1.2.0';
+        $this->version = '1.2.1';
         $this->author = 'ROI Hunter';
         $this->need_instance = 1;
         $this->bootstrap = true;
