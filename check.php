@@ -36,29 +36,34 @@ if (!Roihunter::isModuleLoaded()) {
 }
 
 ROIHunterAuthenticator::getInstance()->authenticate();
+try {
+    $roihunterModule = Roihunter::getModuleInstance();
+    $id_shop = $roihunterModule->getShopFromUrl($_SERVER['HTTP_HOST']);
+    Context::getContext()->shop->id = $id_shop;
 
-$roihunterModule = Roihunter::getModuleInstance();
-$id_shop = $roihunterModule->getShopFromUrl($_SERVER['HTTP_HOST']);
-Context::getContext()->shop->id = $id_shop;
+    // nelze pred contextem eshopu
+    $enabled = true;
+    if (!$roihunterModule->active || !Module::isEnabled('roihunter')) {
+        $enabled = false;
+    }
 
-// nelze pred contextem eshopu
-$enabled = true;
-if (!$roihunterModule->active || !Module::isEnabled('roihunter')) {
-    $enabled = false;
+    $content = [
+        "prestashop_version" => _PS_VERSION_,
+        "prestashop_mode" => "",
+        "roihuntereasy_enabled" => $enabled,
+        "roihuntereasy_accounts" => 1,
+        "roihuntereasy_version" => $roihunterModule->getPluginVersion(),
+        "php_version" => phpversion(),
+    ];
+    $content = json_encode($content);
+
+
+    header("HTTP/1.1 200 OK");
+    header("Content-Type:application/json");
+    echo($content);
+    die();
+} catch (Exception $e) {
+    header("HTTP/1.1 500 Internal Server Error", true, 500);
+    echo("Unknown server exception: " . $e->getMessage() . " \nStacktrace: " . $e->getTraceAsString());
+    die();
 }
-
-$content = [
-    "prestashop_version" => _PS_VERSION_,
-    "prestashop_mode" => "",
-    "roihuntereasy_enabled" => $enabled,
-    "roihuntereasy_accounts" => 1,
-    "roihuntereasy_version" => $roihunterModule->getPluginVersion(),
-    "php_version" => phpversion(),
-];
-$content = json_encode($content);
-
-
-header("HTTP/1.1 200 OK");
-header("Content-Type:application/json");
-echo($content);
-die();
