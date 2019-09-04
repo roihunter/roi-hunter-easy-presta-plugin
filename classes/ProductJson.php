@@ -114,7 +114,7 @@ class ProductJson
         if ($idCategory && !isset($this->categoryCache[$idCategory])) {
             $this->categoryCache[$idCategory] = $this->translateCategory($idCategory, $idLanguage);
         }
-        return empty($this->categoryCache[$idCategory]) ? "" : $this->categoryCache[$idCategory];
+        return !$idCategory || empty($this->categoryCache[$idCategory]) ? "" : $this->categoryCache[$idCategory];
     }
 
     private function translateCategory($idCategory, $idLanguage)
