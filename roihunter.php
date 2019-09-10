@@ -108,8 +108,15 @@ class Roihunter extends Module
             $smarty->fetch($this->local_path . 'views/templates/front/rheasy_events_tracking.tpl');
     }
 
+    public function log($message) {
+        PrestaShopLogger::addLog($message, null, null, 'Swift_Message', null, true);
+    }
+
     public function hookDisplayFooter()
     {
+        $this->log('Display footer started');
+        $this->log('trackingParamsAreInitialized() -> ' . $this->roiHunterStorage->trackingParamsAreInitialized());
+
         if (!$this->roiHunterStorage->trackingParamsAreInitialized()) {
             return '';
         }

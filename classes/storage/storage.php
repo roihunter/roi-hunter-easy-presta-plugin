@@ -13,7 +13,7 @@
  * @link      https://easy.roihunter.com/
  */
 
-class ROIHunterStorage
+class ROIHunterStorage implements JsonSerializable
 {
     const RH_SYSTEM_USER_ID = 'id';
     const RH_ACCESS_TOKEN = 'access_token';
@@ -175,5 +175,15 @@ class ROIHunterStorage
             return 'ROIHUNTER_GOOGLE_LABEL';
         }
         return 'ROIHUNTER_' . Tools::strtoupper($key);
+    }
+
+
+    public function jsonSerialize()
+    {
+        $object = array('shop_id' => $this->shopId);
+        foreach (self::STATE_STORAGE_KEYS as $key) {
+            $object[$key] = $this->getConfigFormValue($key);
+        }
+        return $object;
     }
 }
