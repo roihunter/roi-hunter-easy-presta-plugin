@@ -44,7 +44,14 @@ class ROIHunterStorage
 
     private function __construct()
     {
-        $this->shopId = Context::getContext()->shop->id;
+        $query = (new DbQuery())
+            ->select('ms.id_shop')
+            ->from('module_shop', 'ms')
+            ->innerJoin('module', 'm', 'm.id_module = ms.id_module')
+            ->where('m.name = \'roihunter\'');
+
+        $result = Db::getInstance()->executeS($query);
+        $this->shopId = $result[0]['id_shop'];
     }
 
     public static function getInstance()
