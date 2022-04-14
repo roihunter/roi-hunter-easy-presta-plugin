@@ -13,7 +13,7 @@
  * @link      https://easy.roihunter.com/
  */
 
-class ROIHunterStorage
+class ROIHunterStorage implements JsonSerializable
 {
     const RH_SYSTEM_USER_ID = 'id';
     const RH_ACCESS_TOKEN = 'access_token';
@@ -44,7 +44,14 @@ class ROIHunterStorage
 
     private function __construct()
     {
-        $this->shopId = Context::getContext()->shop->id;
+        $query = (new DbQuery())
+            ->select('ms.id_shop')
+            ->from('module_shop', 'ms')
+            ->innerJoin('module', 'm', 'm.id_module = ms.id_module')
+            ->where('m.name = \'roihunter\'');
+
+        $result = Db::getInstance()->executeS($query);
+        $this->shopId = $result[0]['id_shop'];
     }
 
     public static function getInstance()
@@ -168,5 +175,15 @@ class ROIHunterStorage
             return 'ROIHUNTER_GOOGLE_LABEL';
         }
         return 'ROIHUNTER_' . Tools::strtoupper($key);
+    }
+
+
+    public function jsonSerialize()
+    {
+        $object = array('shop_id' => $this->shopId);
+        foreach (self::STATE_STORAGE_KEYS as $key) {
+            $object[$key] = $this->getConfigFormValue($key);
+        }
+        return $object;
     }
 }

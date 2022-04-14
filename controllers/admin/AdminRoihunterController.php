@@ -27,8 +27,14 @@ class AdminRoihunterController extends AdminController
         parent::__construct();
     }
 
+    public function log($message) {
+        PrestaShopLogger::addLog($message, null, null, 'Swift_Message', null, true);
+    }
+
     public function initContent()
     {
+        $this->log('Storage: ' . json_encode(ROIHunterStorage::getInstance()));
+
         $this->display = 'view';
 
         $shop_context = $this->roihunterModule->getAdminShopContext();
